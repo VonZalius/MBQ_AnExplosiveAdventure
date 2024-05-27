@@ -1,13 +1,24 @@
+import { tilesetGround, tileSize, tileImages } from './tiles.js';
+
 // Obtenir les éléments du DOM
 const startButton = document.getElementById('startButton');
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
+const backgroundMusic = document.getElementById('backgroundMusic');
+const gameMusic = document.getElementById('gameMusic');
+
 
 // Désactiver le lissage d'image pour préserver la netteté des sprites en pixel art
 context.imageSmoothingEnabled = false;
 
+// ------------------------------------------------------------- INIT -------------------------------------------------------------
+
+let showCollision = false;
+
 // Variables du personnage
-const characterSize = 100;
+let characterSize = 150;
+const collisionBoxSize = 50; // Taille de la boîte de collision du personnage
+const collisionOffsetY = 30;
 let characterX = canvas.width / 2 - characterSize / 2;
 let characterY = canvas.height / 2 - characterSize / 2;
 let characterSpeed = 300; // Pixels par seconde
@@ -40,36 +51,23 @@ let frameTime = 0;
 
 //Enemy
 const enemyImage = new Image();
-enemyImage.src = 'src/enemy.png';
+enemyImage.src = 'src/mur.png';
 
 // MAPS
-const tilesetGround = new Image();
-// const tilesetWater = new Image();
-// const tilesetWall = new Image();
-tilesetGround.src = 'src/forest_/forest_.png'; // Remplacez par le chemin vers votre tileset de sol
-// tilesetWater.src = 'src/water_tileset.png';  // Remplacez par le chemin vers votre tileset d'eau
-// tilesetWall.src = 'src/wall_tileset.png';    // Remplacez par le chemin vers votre tileset de mur
-const tileSize = 16; // Taille de chaque case dans le tileset
-const tileImages = {
-    100: { tileset: tilesetGround, x: 1, y: 1 }, // Coordonnées (x, y) de la case 'sol' dans le tilesetGround
-    101: { tileset: tilesetGround, x: 1, y: 2 }, // Coordonnées (x, y) de la case 'eau' dans le tilesetWater
-    102: { tileset: tilesetGround, x: 2, y: 1 }  // Coordonnées (x, y) de la case 'mur' dans le tilesetWall
-};
 const map1 = [
-    [100, 100, 100, 100, 100],
-    [100, 102, 100, 101, 100],
-    [100, 100, 100, 100, 100],
-    [100, 102, 100, 101, 100],
-    [100, 100, 100, 100, 100],
+    [101, 133, 138, 138, 138, 138, 138, 138, 130, 101],
+    [133, 135, 100, 100, 100, 100, 100, 100, 136, 130],
+    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
+    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
+    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
+    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
+    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
+    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
+    [132, 134, 100, 100, 100, 100, 100, 100, 137, 131],
+    [101, 132, 140, 140, 140, 140, 140, 140, 131, 101],
 ];
-const map2 = [
-    [100, 100, 100, 100, 100],
-    [100, 100, 100, 100, 100],
-    [100, 100, 100, 100, 100],
-    [100, 100, 100, 100, 100],
-    [100, 100, 100, 100, 100],
-];
-const m = gRI(1, 3);
+
+//const m = gRI(1, 1);
 
 // Suivre les touches enfoncées
 const keys = {};
@@ -80,6 +78,8 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('keyup', function(event) {
     keys[event.code] = false;
 });
+
+// ------------------------------------------------------------- ENEMY -------------------------------------------------------------
 
 // Classe pour les ennemis
 class Enemy {
@@ -138,8 +138,126 @@ const initialEnemies = [
     // new Enemy(x, y, size, speedX, speedY, enemyImage)
 ];
 
+// Mettre à jour la position des ennemis
+function updateEnemies(deltaTime) {
+    for (const enemy of enemies) {
+        enemy.update(deltaTime);
+    }
+}
+
+// Vérifier les collisions avec les ennemis
+function checkCollisions() {
+    const collisionX = characterX + (characterSize - collisionBoxSize) / 2;
+    const collisionY = characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY;
+    for (const enemy of enemies) {
+        if (enemy.checkCollision(collisionX, collisionY, collisionBoxSize)) {
+            alert('Vous avez été touché par un ennemi !');
+            // Réinitialiser le jeu
+            location.reload();
+        }
+    }
+}
+
+// ------------------------------------------------------------- UPDATE -------------------------------------------------------------
+
+// Vérifier si une position est valide (ne contient pas d'obstacle)
+function isPositionValid(collisionX, collisionY) {
+    const row = Math.floor(collisionY / (canvas.height / map1.length));
+    const col = Math.floor(collisionX / (canvas.width / map1[0].length));
+    if (row < 0 || row >= map1.length || col < 0 || col >= map1[0].length) {
+        return false;
+    }
+    const tile = map1[row][col];
+    return tile == 100;
+}
+
+// Vérifier si une boîte de collision est entièrement dans une position valide
+function isCollisionBoxValid(x, y, width, height) {
+    return (
+        isPositionValid(x, y) &&
+        isPositionValid(x + width, y) &&
+        isPositionValid(x, y + height) &&
+        isPositionValid(x + width, y + height)
+    );
+}
+
+// Mettre à jour la position du personnage
+function update(deltaTime) {
+    let moveX = 0;
+    let moveY = 0;
+
+    // Mouvement
+    if ((keys['ArrowUp'] || keys['KeyW']) && characterY + (collisionBoxSize * 0.5) - characterSpeed * deltaTime >= 0) {
+        moveY = -characterSpeed * deltaTime;
+    }
+    if ((keys['ArrowDown'] || keys['KeyS']) && characterY + (collisionBoxSize * 1.5) + characterSpeed * deltaTime <= canvas.height) {
+        moveY = characterSpeed * deltaTime;
+    }
+    if ((keys['ArrowLeft'] || keys['KeyA']) && characterX + (collisionBoxSize * 0.5) - characterSpeed * deltaTime >= 0) {
+        moveX = -characterSpeed * deltaTime;
+        currentDirection = 'left';
+    }
+    if ((keys['ArrowRight'] || keys['KeyD']) && characterX + (collisionBoxSize * 1.5) + characterSpeed * deltaTime <= canvas.width) {
+        moveX = characterSpeed * deltaTime;
+        currentDirection = 'right';
+    }
+    
+    // Courir
+    if (keys['Space']) {
+        characterSpeed = characterRunSpeed;
+    }
+    if (!keys['Space']) {
+        characterSpeed = characterWalkSpeed;
+    }
+
+    // Montrer les collisions
+    if (keys['ShiftLeft']) {
+        showCollision = true;
+    }
+    if (!keys['ShiftLeft']) {
+        showCollision = false;
+    }
+
+    // Ajuster la vitesse en diagonale
+    if (moveX !== 0 && moveY !== 0) {
+        moveX /= Math.sqrt(2);
+        moveY /= Math.sqrt(2);
+    }
+    
+    // Calculer la nouvelle position de la boîte de collision
+    const newCollisionX = characterX + moveX + (characterSize - collisionBoxSize) / 2;
+    const newCollisionY = characterY + moveY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY;
+    
+    // Vérifier les nouvelles positions
+    if (isCollisionBoxValid(newCollisionX, characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY, collisionBoxSize, collisionBoxSize)) {
+        characterX += moveX;
+    }
+    if (isCollisionBoxValid(characterX + (characterSize - collisionBoxSize) / 2, newCollisionY, collisionBoxSize, collisionBoxSize)) {
+        characterY += moveY;
+    }
+}
+
+// ------------------------------------------------------------- OTHER -------------------------------------------------------------
+
 function gRI(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
+}
+
+// ------------------------------------------------------------- DRAW -------------------------------------------------------------
+
+// Dessiner une boîte de collision
+function drawCollisionBox(x, y, width, height) {
+    context.strokeStyle = 'red';
+    context.lineWidth = 2;
+    context.strokeRect(x, y, width, height);
+}
+
+// Dessiner un message sur l'écran
+function drawMessage(message) {
+    context.font = '48px Arial';
+    context.fillStyle = 'black';
+    context.textAlign = 'center';
+    context.fillText(message, canvas.width / 2, canvas.height / 2);
 }
 
 function updateCharacterAnimation(deltaTime) {
@@ -158,7 +276,13 @@ function drawCharacter(x, y) {
         frame.x * charactertileSize, frame.y * charactertileSize, charactertileSize, charactertileSize, // Source rectangle
         x, y, characterSize, characterSize // Destination rectangle
     );
+    // Dessiner la boîte de collision du personnage
+    const collisionX = x + (characterSize - collisionBoxSize) / 2;
+    const collisionY = y + (characterSize - collisionBoxSize) / 2 + collisionOffsetY;
+    if (showCollision)
+        drawCollisionBox(collisionX, collisionY, collisionBoxSize, collisionBoxSize);
 }
+
 
 function drawMap(map) {
     const rows = map.length;
@@ -175,32 +299,13 @@ function drawMap(map) {
                 sprite.x * tileSize, sprite.y * tileSize, tileSize, tileSize, // Source rectangle
                 col * tileWidth, row * tileHeight, tileWidth, tileHeight // Destination rectangle
             );
+
+            // Dessiner la boîte de collision des murs
+            if (tile != 100) {
+                if (showCollision)
+                    drawCollisionBox(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
+            }
         }
-    }
-}
-
-// Effacer le canevas et redessiner le personnage
-function draw() {
-    if(m == 1)
-        drawMap(map1);
-    else if(m == 2)
-        drawMap(map2);
-    drawCharacter(characterX, characterY);
-    drawEnemies();
-}
-
-// Dessiner un message sur l'écran
-function drawMessage(message) {
-    context.font = '48px Arial';
-    context.fillStyle = 'black';
-    context.textAlign = 'center';
-    context.fillText(message, canvas.width / 2, canvas.height / 2);
-}
-
-// Mettre à jour la position des ennemis
-function updateEnemies(deltaTime) {
-    for (const enemy of enemies) {
-        enemy.update(deltaTime);
     }
 }
 
@@ -208,58 +313,23 @@ function updateEnemies(deltaTime) {
 function drawEnemies() {
     for (const enemy of enemies) {
         enemy.draw(context);
+        if (showCollision)
+            drawCollisionBox(enemy.x, enemy.y, enemy.size, enemy.size);
     }
 }
 
-// Vérifier les collisions avec les ennemis
-function checkCollisions() {
-    for (const enemy of enemies) {
-        if (enemy.checkCollision(characterX, characterY, characterSize)) {
-            alert('Vous avez été touché par un ennemi !');
-            // Réinitialiser le jeu
-            location.reload();
-        }
-    }
+// Effacer le canevas et redessiner le personnage
+function draw() {
+    /*if(m == 1)
+        drawMap(map1);
+    else if(m == 2)*/
+        drawMap(map1);
+    drawCharacter(characterX, characterY);
+    drawEnemies();
 }
 
-// Mettre à jour la position du personnage
-function update(deltaTime) {
-    let moveX = 0;
-    let moveY = 0;
+// ------------------------------------------------------------- BASE -------------------------------------------------------------
 
-    // Mouvement
-    if ((keys['ArrowUp'] || keys['KeyW']) && characterY - characterSpeed * deltaTime >= 0) {
-        moveY = -characterSpeed * deltaTime;
-    }
-    if ((keys['ArrowDown'] || keys['KeyS']) && characterY + characterSize + characterSpeed * deltaTime <= canvas.height) {
-        moveY = characterSpeed * deltaTime;
-    }
-    if ((keys['ArrowLeft'] || keys['KeyA']) && characterX - characterSpeed * deltaTime >= 0) {
-        moveX = -characterSpeed * deltaTime;
-        currentDirection = 'left';
-    }
-    if ((keys['ArrowRight'] || keys['KeyD']) && characterX + characterSize + characterSpeed * deltaTime <= canvas.width) {
-        moveX = characterSpeed * deltaTime;
-        currentDirection = 'right';
-    }
-
-    // Courir
-    if (keys['Space']) {
-        characterSpeed = characterRunSpeed;
-    }
-    if (!keys['Space']) {
-        characterSpeed = characterWalkSpeed;
-    }
-
-    // Ajuster la vitesse en diagonale
-    if (moveX !== 0 && moveY !== 0) {
-        moveX /= Math.sqrt(2);
-        moveY /= Math.sqrt(2);
-    }
-
-    characterX += moveX;
-    characterY += moveY;
-}
 
 // Boucle de jeu
 let lastTime = 0;
@@ -287,6 +357,9 @@ function startGame() {
     startButton.style.display = 'none';
     canvas.style.display = 'block';
     requestAnimationFrame(gameLoop);
+
+    backgroundMusic.pause();
+    gameMusic.play();
 
     // Ajouter les ennemis après 3 secondes
     setTimeout(() => {
