@@ -1,34 +1,84 @@
-
 // Obtenir les éléments du DOM
 const startButton = document.getElementById('startButton');
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 
+// Désactiver le lissage d'image pour préserver la netteté des sprites en pixel art
+context.imageSmoothingEnabled = false;
+
 // Variables du personnage
-const characterSize = 50;
+const characterSize = 100;
 let characterX = canvas.width / 2 - characterSize / 2;
 let characterY = canvas.height / 2 - characterSize / 2;
-const characterSpeed = 300; // Pixels par seconde
+let characterSpeed = 300; // Pixels par seconde
+const characterWalkSpeed = 300; // Pixels par seconde
+const characterRunSpeed = 500; // Pixels par seconde
 
 // Charger les images
-const backgroundImage = new Image();
-const characterImage = new Image();
-const enemyImage = new Image();
+//Player
+const characterTileset = new Image();
+characterTileset.src = 'src/camelot_/mordred_.png';
+const characterFrames = {
+    right: [
+        { x: 0, y: 0 }, // Frame 1
+        { x: 1, y: 0 }, // Frame 2
+        { x: 2, y: 0 }, // Frame 3
+        { x: 3, y: 0 }  // Frame 4
+    ],
+    left: [
+        { x: 4, y: 0 }, // Frame 1
+        { x: 5, y: 0 }, // Frame 2
+        { x: 6, y: 0 }, // Frame 3
+        { x: 7, y: 0 }  // Frame 4
+    ]
+};
+const charactertileSize = 32; // Taille de chaque case dans le tileset
+let currentDirection = 'left';
+let currentFrameIndex = 0;
+const frameRate = 10; // Nombre de frames par seconde
+let frameTime = 0;
 
-backgroundImage.src = 'src/background.png';
-characterImage.src = 'src/character.png';
+//Enemy
+const enemyImage = new Image();
 enemyImage.src = 'src/enemy.png';
+
+// MAPS
+const tilesetGround = new Image();
+// const tilesetWater = new Image();
+// const tilesetWall = new Image();
+tilesetGround.src = 'src/forest_/forest_.png'; // Remplacez par le chemin vers votre tileset de sol
+// tilesetWater.src = 'src/water_tileset.png';  // Remplacez par le chemin vers votre tileset d'eau
+// tilesetWall.src = 'src/wall_tileset.png';    // Remplacez par le chemin vers votre tileset de mur
+const tileSize = 16; // Taille de chaque case dans le tileset
+const tileImages = {
+    100: { tileset: tilesetGround, x: 1, y: 1 }, // Coordonnées (x, y) de la case 'sol' dans le tilesetGround
+    101: { tileset: tilesetGround, x: 1, y: 2 }, // Coordonnées (x, y) de la case 'eau' dans le tilesetWater
+    102: { tileset: tilesetGround, x: 2, y: 1 }  // Coordonnées (x, y) de la case 'mur' dans le tilesetWall
+};
+const map1 = [
+    [100, 100, 100, 100, 100],
+    [100, 102, 100, 101, 100],
+    [100, 100, 100, 100, 100],
+    [100, 102, 100, 101, 100],
+    [100, 100, 100, 100, 100],
+];
+const map2 = [
+    [100, 100, 100, 100, 100],
+    [100, 100, 100, 100, 100],
+    [100, 100, 100, 100, 100],
+    [100, 100, 100, 100, 100],
+    [100, 100, 100, 100, 100],
+];
+const m = gRI(1, 3);
 
 // Suivre les touches enfoncées
 const keys = {};
-
 // Ajouter des écouteurs pour les événements de touche
 document.addEventListener('keydown', function(event) {
-    keys[event.key] = true;
+    keys[event.code] = true;
 });
-
 document.addEventListener('keyup', function(event) {
-    keys[event.key] = false;
+    keys[event.code] = false;
 });
 
 // Classe pour les ennemis
@@ -92,14 +142,49 @@ function gRI(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
-// Dessiner le personnage
+function updateCharacterAnimation(deltaTime) {
+    frameTime += deltaTime;
+    if (frameTime >= 1 / frameRate) {
+        currentFrameIndex = (currentFrameIndex + 1) % characterFrames[currentDirection].length;
+        frameTime = 0;
+    }
+}
+
+// Dessiner le personnage à partir du tileset
 function drawCharacter(x, y) {
-    context.drawImage(characterImage, x, y, characterSize, characterSize);
+    const frame = characterFrames[currentDirection][currentFrameIndex];
+    context.drawImage(
+        characterTileset,
+        frame.x * charactertileSize, frame.y * charactertileSize, charactertileSize, charactertileSize, // Source rectangle
+        x, y, characterSize, characterSize // Destination rectangle
+    );
+}
+
+function drawMap(map) {
+    const rows = map.length;
+    const cols = map[0].length;
+    const tileWidth = canvas.width / cols;
+    const tileHeight = canvas.height / rows;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            let tile = map[row][col];
+            let sprite = tileImages[tile];
+            context.drawImage(
+                sprite.tileset,
+                sprite.x * tileSize, sprite.y * tileSize, tileSize, tileSize, // Source rectangle
+                col * tileWidth, row * tileHeight, tileWidth, tileHeight // Destination rectangle
+            );
+        }
+    }
 }
 
 // Effacer le canevas et redessiner le personnage
 function draw() {
-    context.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+    if(m == 1)
+        drawMap(map1);
+    else if(m == 2)
+        drawMap(map2);
     drawCharacter(characterX, characterY);
     drawEnemies();
 }
@@ -142,17 +227,28 @@ function update(deltaTime) {
     let moveX = 0;
     let moveY = 0;
 
-    if ((keys['ArrowUp'] || keys['w']) && characterY - characterSpeed * deltaTime >= 0) {
+    // Mouvement
+    if ((keys['ArrowUp'] || keys['KeyW']) && characterY - characterSpeed * deltaTime >= 0) {
         moveY = -characterSpeed * deltaTime;
     }
-    if ((keys['ArrowDown'] || keys['s']) && characterY + characterSize + characterSpeed * deltaTime <= canvas.height) {
+    if ((keys['ArrowDown'] || keys['KeyS']) && characterY + characterSize + characterSpeed * deltaTime <= canvas.height) {
         moveY = characterSpeed * deltaTime;
     }
-    if ((keys['ArrowLeft'] || keys['a']) && characterX - characterSpeed * deltaTime >= 0) {
+    if ((keys['ArrowLeft'] || keys['KeyA']) && characterX - characterSpeed * deltaTime >= 0) {
         moveX = -characterSpeed * deltaTime;
+        currentDirection = 'left';
     }
-    if ((keys['ArrowRight'] || keys['d']) && characterX + characterSize + characterSpeed * deltaTime <= canvas.width) {
+    if ((keys['ArrowRight'] || keys['KeyD']) && characterX + characterSize + characterSpeed * deltaTime <= canvas.width) {
         moveX = characterSpeed * deltaTime;
+        currentDirection = 'right';
+    }
+
+    // Courir
+    if (keys['Space']) {
+        characterSpeed = characterRunSpeed;
+    }
+    if (!keys['Space']) {
+        characterSpeed = characterWalkSpeed;
     }
 
     // Ajuster la vitesse en diagonale
@@ -175,6 +271,7 @@ function gameLoop(timestamp) {
     lastTime = timestamp;
 
     update(deltaTime);
+    updateCharacterAnimation(deltaTime);
     updateEnemies(deltaTime);
     draw();
     if (elapsedTime < 3) {
@@ -201,9 +298,9 @@ function startGame() {
 startButton.addEventListener('click', startGame);
 
 // Assurez-vous que les images sont chargées avant de démarrer la boucle de jeu
-backgroundImage.onload = function() {
-    characterImage.onload = function() {
-        enemyImage.onload = function() {
+characterTileset.onload = function() {
+    enemyImage.onload = function() {
+        tilesetGround.onload = function() {
             // Le jeu commencera lorsque le bouton sera cliqué
         };
     };
