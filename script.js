@@ -512,6 +512,7 @@ function startGame() {
     requestAnimationFrame(gameLoop);
 
     backgroundMusic.pause();
+    backgroundMusic.src = '';
     gameMusic.play();
 
     const m = gRI(1, 3);
