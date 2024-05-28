@@ -22,8 +22,21 @@ const tileImages = {
 
 // --------------------------------------- GROUND ---------------------------------------
 
-    100: { tileset: tilesetGround, x: 2, y: 2 },  // Sol
-    101: { tileset: tilesetGround, x: 4, y: 7 },  // Eau
+    900: { tileset: tilesetGround, x: 2, y: 2 , w: 1, h: 1},  // Sol
+    901: { tileset: tilesetGround, x: 8, y: 1 , w: 1, h: 1},  // Sol
+    902: { tileset: tilesetGround, x: 9, y: 1 , w: 1, h: 1},  // Sol
+    903: { tileset: tilesetGround, x: 10, y: 1 , w: 1, h: 1},  // Sol
+    904: { tileset: tilesetGround, x: 11, y: 1 , w: 1, h: 1},  // Sol
+    905: { tileset: tilesetGround, x: 8, y: 2 , w: 1, h: 1},  // Sol
+    906: { tileset: tilesetGround, x: 9, y: 2 , w: 1, h: 1},  // Sol
+    907: { tileset: tilesetGround, x: 10, y: 2 , w: 1, h: 1},  // Sol
+    908: { tileset: tilesetGround, x: 11, y: 2 , w: 1, h: 1},  // Sol
+    909: { tileset: tilesetGround, x: 10, y: 3 , w: 1, h: 1},  // Sol
+    910: { tileset: tilesetGround, x: 11, y: 3 , w: 1, h: 1},  // Sol
+    911: { tileset: tilesetGround, x: 10, y: 4 , w: 1, h: 1},  // Sol
+    912: { tileset: tilesetGround, x: 11, y: 4 , w: 1, h: 1},  // Sol
+
+    101: { tileset: tilesetGround, x: 4, y: 7 , w: 1, h: 1},  // Eau
 
 //-------
 
@@ -65,20 +78,20 @@ const tileImages = {
 
 //-------
 
-    130: { tileset: tilesetGround, x: 3, y: 5 },  // Bord de l'eau NE
-    131: { tileset: tilesetGround, x: 3, y: 7 },  // Bord de l'eau SE
-    132: { tileset: tilesetGround, x: 1, y: 7 },  // Bord de l'eau SO
-    133: { tileset: tilesetGround, x: 1, y: 5 },  // Bord de l'eau NO
+    130: { tileset: tilesetGround, x: 3, y: 5 , w: 1, h: 1},  // Bord de l'eau NE
+    131: { tileset: tilesetGround, x: 3, y: 7 , w: 1, h: 1},  // Bord de l'eau SE
+    132: { tileset: tilesetGround, x: 1, y: 7 , w: 1, h: 1},  // Bord de l'eau SO
+    133: { tileset: tilesetGround, x: 1, y: 5 , w: 1, h: 1},  // Bord de l'eau NO
 
-    134: { tileset: tilesetGround, x: 5, y: 5 },  // Bord de l'eau intérieur NE
-    135: { tileset: tilesetGround, x: 5, y: 6 },  // Bord de l'eau intérieur SE
-    136: { tileset: tilesetGround, x: 4, y: 6 },  // Bord de l'eau intérieur SO
-    137: { tileset: tilesetGround, x: 4, y: 5 },  // Bord de l'eau intérieur NO
+    134: { tileset: tilesetGround, x: 5, y: 5 , w: 1, h: 1},  // Bord de l'eau intérieur NE
+    135: { tileset: tilesetGround, x: 5, y: 6 , w: 1, h: 1},  // Bord de l'eau intérieur SE
+    136: { tileset: tilesetGround, x: 4, y: 6 , w: 1, h: 1},  // Bord de l'eau intérieur SO
+    137: { tileset: tilesetGround, x: 4, y: 5 , w: 1, h: 1},  // Bord de l'eau intérieur NO
 
-    138: { tileset: tilesetGround, x: 2, y: 5 },  // Bord de l'eau N
-    139: { tileset: tilesetGround, x: 3, y: 6 },  // Bord de l'eau E
-    140: { tileset: tilesetGround, x: 2, y: 7 }, // Bord de l'eau S
-    141: { tileset: tilesetGround, x: 1, y: 6 }, // Bord de l'eau O
+    138: { tileset: tilesetGround, x: 2, y: 5 , w: 1, h: 1},  // Bord de l'eau N
+    139: { tileset: tilesetGround, x: 3, y: 6 , w: 1, h: 1},  // Bord de l'eau E
+    140: { tileset: tilesetGround, x: 2, y: 7 , w: 1, h: 1}, // Bord de l'eau S
+    141: { tileset: tilesetGround, x: 1, y: 6 , w: 1, h: 1}, // Bord de l'eau O
 
 // --------------------------------------- WALL ---------------------------------------
 
@@ -137,18 +150,18 @@ const tileImages = {
 
     // --------------------------------------- TREE ---------------------------------------
 
-    300: { tileset: tilesetTree, x: 1, y: 6 },  // Arbre 1
-    301: { tileset: tilesetTree, x: 2, y: 6 },  // Arbre 2
-    302: { tileset: tilesetTree, x: 3, y: 6 },  // Arbre 3
-    303: { tileset: tilesetTree, x: 4, y: 6 },  // Arbre 4
+    300: { tileset: tilesetTree, x: 1, y: 1 , w: 1, h: 2},  // Arbre 1
+    301: { tileset: tilesetTree, x: 2, y: 1 , w: 1, h: 2},  // Arbre 2
+    302: { tileset: tilesetTree, x: 3.5, y: 1 , w: 2, h: 2},  // Arbre 3
+    303: { tileset: tilesetTree, x: 6, y: 1 , w: 1, h: 2},  // Arbre 4
 
-    304: { tileset: tilesetTree, x: 5, y: 6 },  // Buisson 1
-    305: { tileset: tilesetTree, x: 6, y: 6 },  // Buisson 2
+    304: { tileset: tilesetTree, x: 1, y: 3 , w: 1, h: 1},  // Buisson 1
+    305: { tileset: tilesetTree, x: 1, y: 4 , w: 1, h: 1},  // Buisson 2
 
-    306: { tileset: tilesetTree, x: 7, y: 6 },  // Rocher 1
-    307: { tileset: tilesetTree, x: 8, y: 6 },  // Rocher 2
-    308: { tileset: tilesetTree, x: 9, y: 6 },  // Rocher Grand 1
-    309: { tileset: tilesetTree, x: 10, y: 6 }, // Rocher Grand 2
+    306: { tileset: tilesetTree, x: 4, y: 3 , w: 1, h: 1},  // Rocher 1
+    307: { tileset: tilesetTree, x: 4, y: 4 , w: 1, h: 1},  // Rocher 2
+    308: { tileset: tilesetTree, x: 0, y: 0 },  // Rocher Grand 1
+    309: { tileset: tilesetTree, x: 0, y: 0 }, // Rocher Grand 2
 
 //-------
 

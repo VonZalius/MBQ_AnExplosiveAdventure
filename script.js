@@ -17,14 +17,16 @@ context.imageSmoothingEnabled = false;
 let showCollision = false;
 
 // Variables du personnage
-let characterSize = 150;
-const collisionBoxSize = 50; // Taille de la boîte de collision du personnage
-const collisionOffsetY = 30;
+let characterSize = 0;
+const baseCharacterSize = 150; // Taille du personnage pour une carte de 10 cases
+const baseMapSize = 10; // Taille de la carte de base (10 cases)
+let collisionBoxSize = 50; // Taille de la boîte de collision du personnage
+let collisionOffsetY = 30;
 let characterX = canvas.width / 2 - characterSize / 2;
 let characterY = canvas.height / 2 - characterSize / 2;
+let characterWalkSpeed = 0; // Pixels par seconde
+let characterRunSpeed = 0; // Pixels par seconde
 let characterSpeed = 300; // Pixels par seconde
-const characterWalkSpeed = 300; // Pixels par seconde
-const characterRunSpeed = 500; // Pixels par seconde
 let isDead = false;
 
 // Charger les images
@@ -76,6 +78,7 @@ const characterFrames = {
     ]
 };
 const charactertileSize = 32; // Taille de chaque case dans le tileset
+const characterFoot = 4;
 let currentDirection = 'left';
 let currentFrameIndex = 0;
 let frameRate = 10; // Nombre de frames par seconde
@@ -86,17 +89,36 @@ const enemyImage = new Image();
 enemyImage.src = 'src/mur.png';
 
 // MAPS
+let map;
+
 const map1 = [
+    [101, 133, 138, 138, 138, 138, 138, 138, 130, 101, 101, 101, 101],
+    [133, 135, 900, 900, 900, 900, 900, 900, 136, 130, 101, 101, 101],
+    [141, 900, 900, 900, 301, 900, 300, 900, 900, 139, 101, 101, 101],
+    [141, 900, 302, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
+    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
+    [141, 900, 900, 900, 900, 900, 900, 303, 900, 139, 101, 101, 101],
+    [141, 900, 305, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
+    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
+    [132, 134, 900, 900, 900, 900, 304, 900, 137, 131, 101, 101, 101],
+    [101, 132, 140, 140, 140, 140, 140, 140, 131, 101, 101, 101, 101],
+    [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
+    [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
+    [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101]
+];
+
+// MAPS
+const map2 = [
     [101, 133, 138, 138, 138, 138, 138, 138, 130, 101],
-    [133, 135, 100, 100, 100, 100, 100, 100, 136, 130],
-    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
-    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
-    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
-    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
-    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
-    [141, 100, 100, 100, 100, 100, 100, 100, 100, 139],
-    [132, 134, 100, 100, 100, 100, 100, 100, 137, 131],
-    [101, 132, 140, 140, 140, 140, 140, 140, 131, 101],
+    [133, 135, 900, 900, 900, 900, 900, 900, 136, 130],
+    [141, 900, 900, 900, 301, 900, 300, 900, 900, 139],
+    [141, 900, 302, 900, 900, 900, 900, 900, 900, 139],
+    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139],
+    [141, 900, 900, 900, 900, 900, 900, 303, 900, 139],
+    [141, 900, 305, 900, 900, 900, 900, 900, 900, 139],
+    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139],
+    [132, 134, 900, 900, 900, 900, 304, 900, 137, 131],
+    [101, 132, 140, 140, 140, 140, 140, 140, 131, 101]
 ];
 
 //const m = gRI(1, 1);
@@ -217,13 +239,13 @@ function checkCollisions() {
 
 // Vérifier si une position est valide (ne contient pas d'obstacle)
 function isPositionValid(collisionX, collisionY) {
-    const row = Math.floor(collisionY / (canvas.height / map1.length));
-    const col = Math.floor(collisionX / (canvas.width / map1[0].length));
-    if (row < 0 || row >= map1.length || col < 0 || col >= map1[0].length) {
+    const row = Math.floor(collisionY / (canvas.height / map.length));
+    const col = Math.floor(collisionX / (canvas.width / map[0].length));
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
         return false;
     }
-    const tile = map1[row][col];
-    return tile == 100;
+    const tile = map[row][col];
+    return tile == 900;
 }
 
 // Vérifier si une boîte de collision est entièrement dans une position valide
@@ -365,8 +387,7 @@ function drawCharacter(x, y) {
         drawCollisionBox(collisionX, collisionY, collisionBoxSize, collisionBoxSize);
 }
 
-
-function drawMap(map) {
+function drawBackground(map) {
     const rows = map.length;
     const cols = map[0].length;
     const tileWidth = canvas.width / cols;
@@ -374,18 +395,53 @@ function drawMap(map) {
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            let tile = map[row][col];
-            let sprite = tileImages[tile];
+            let sprite = tileImages[900];
             context.drawImage(
                 sprite.tileset,
-                sprite.x * tileSize, sprite.y * tileSize, tileSize, tileSize, // Source rectangle
-                col * tileWidth, row * tileHeight, tileWidth, tileHeight // Destination rectangle
+                sprite.x * tileSize, sprite.y * tileSize, (sprite.w * tileSize), (sprite.h * tileSize), // Source rectangle
+                tileWidth * (col - sprite.w + 1), tileHeight * (row - sprite.h + 1), sprite.w * tileWidth, (sprite.h * tileHeight) // Destination rectangle
             );
+        }
+    }
+}
 
-            // Dessiner la boîte de collision des murs
-            if (tile != 100) {
+function drawMap(map) {
+
+    drawBackground(map);
+
+    const rows = map.length;
+    const cols = map[0].length;
+    const tileWidth = canvas.width / cols;
+    const tileHeight = canvas.height / rows;
+
+    // Calculer la position du personnage en termes de lignes et de colonnes
+    //const characterBaseX = characterX + characterSize; // Position en bas à droite du sprite
+    const characterBaseY = characterY + characterSize - (characterSize / charactertileSize * characterFoot) - 3; // Position en bas à droite du sprite
+    const characterRow = Math.floor(characterBaseY / tileHeight);
+    //const characterCol = Math.floor(characterBaseX / tileWidth);
+
+    for (let row = 0; row < rows; row++)
+    {
+        for (let col = 0; col < cols; col++)
+        {
+            let tile = map[row][col];
+            if (tile != 900)
+            {
+                let sprite = tileImages[tile];
+                context.drawImage(
+                    sprite.tileset,
+                    sprite.x * tileSize, sprite.y * tileSize, (sprite.w * tileSize), (sprite.h * tileSize), // Source rectangle
+                    tileWidth * (col - (sprite.w-1)/2), tileHeight * (row - sprite.h + 1), sprite.w * tileWidth, (sprite.h * tileHeight) // Destination rectangle
+                );
+
+                // Dessiner la boîte de collision des murs
                 if (showCollision)
                     drawCollisionBox(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
+            }
+
+            // Appeler drawCharacter juste après avoir dessiné la case du personnage
+            if (row === characterRow) {
+                drawCharacter(characterX, characterY);
             }
         }
     }
@@ -402,16 +458,11 @@ function drawEnemies() {
 
 // Effacer le canevas et redessiner le personnage
 function draw() {
-    /*if(m == 1)
-        drawMap(map1);
-    else if(m == 2)*/
-        drawMap(map1);
-    drawCharacter(characterX, characterY);
+    drawMap(map);
     drawEnemies();
 }
 
 // ------------------------------------------------------------- BASE -------------------------------------------------------------
-
 
 // Boucle de jeu
 let lastTime = 0;
@@ -425,16 +476,33 @@ function gameLoop(timestamp) {
     if (!isDead)
         update(deltaTime);
     else
-        updateDeath(deltaTime);
-    updateCharacterAnimation(deltaTime);
-    updateEnemies(deltaTime);
-    draw();
-    if (elapsedTime < 3) {
-        drawMessage("Ready?");
-    } else {
-        checkCollisions();
+    updateDeath(deltaTime);
+updateCharacterAnimation(deltaTime);
+updateEnemies(deltaTime);
+draw();
+if (elapsedTime < 3) {
+    drawMessage("Ready?");
+} else {
+    checkCollisions();
+}
+requestAnimationFrame(gameLoop);
+}
+
+function getAllPositions(map, tileValue) {
+    const positions = [];
+    for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+            if (map[row][col] === tileValue) {
+                positions.push({ row: row, col: col });
+            }
+        }
     }
-    requestAnimationFrame(gameLoop);
+    return positions;
+}
+
+function getRandomPosition(positions) {
+    const randomIndex = Math.floor(Math.random() * positions.length);
+    return positions[randomIndex];
 }
 
 // Démarrer le jeu
@@ -445,6 +513,28 @@ function startGame() {
 
     backgroundMusic.pause();
     gameMusic.play();
+
+    const m = gRI(1, 3);
+    if (m ==1)
+        map = map1;
+    if (m ==2)
+        map = map2;
+
+    characterSize = baseCharacterSize * (baseMapSize / map.length);
+    collisionBoxSize = characterSize / 3; // Taille de la boîte de collision du personnage
+    collisionOffsetY = characterSize / 5;
+    characterWalkSpeed = characterSize / 5 * 10;
+    characterRunSpeed = characterSize / 3 * 10;
+
+    // Obtenir toutes les positions des cases 900
+    const positions900 = getAllPositions(map, 900);
+    // Sélectionner une position aléatoire parmi les cases 900
+    const randomPosition = getRandomPosition(positions900);
+    // Mettre à jour les coordonnées initiales du personnage
+    const tileWidth = canvas.width / map[0].length;
+    const tileHeight = canvas.height / map.length;
+    characterX = randomPosition.col * tileWidth - (tileWidth/2);
+    characterY = randomPosition.row * tileHeight - (tileHeight);
 
     // Ajouter les ennemis après 3 secondes
     setTimeout(() => {
