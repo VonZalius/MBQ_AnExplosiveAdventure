@@ -6,6 +6,7 @@ const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 const backgroundMusic = document.getElementById('backgroundMusic');
 const gameMusic = document.getElementById('gameMusic');
+const deathMusic = document.getElementById('deathMusic');
 
 
 // Désactiver le lissage d'image pour préserver la netteté des sprites en pixel art
@@ -24,6 +25,7 @@ let characterY = canvas.height / 2 - characterSize / 2;
 let characterSpeed = 300; // Pixels par seconde
 const characterWalkSpeed = 300; // Pixels par seconde
 const characterRunSpeed = 500; // Pixels par seconde
+let isDead = false;
 
 // Charger les images
 //Player
@@ -41,12 +43,42 @@ const characterFrames = {
         { x: 5, y: 0 }, // Frame 2
         { x: 6, y: 0 }, // Frame 3
         { x: 7, y: 0 }  // Frame 4
+    ],
+    walkRight: [
+        { x: 0, y: 1 }, // Frame 1
+        { x: 1, y: 1 }, // Frame 2
+        { x: 2, y: 1 }, // Frame 3
+        { x: 3, y: 1 },  // Frame 4
+        { x: 0, y: 2 }, // Frame 1
+        { x: 1, y: 2 }, // Frame 2
+        { x: 2, y: 2 }, // Frame 3
+        { x: 3, y: 2 }  // Frame 4
+    ],
+    walkLeft: [
+        { x: 4, y: 1 }, // Frame 1
+        { x: 5, y: 1 }, // Frame 2
+        { x: 6, y: 1 }, // Frame 3
+        { x: 7, y: 1 },  // Frame 4
+        { x: 4, y: 2 }, // Frame 1
+        { x: 5, y: 2 }, // Frame 2
+        { x: 6, y: 2 }, // Frame 3
+        { x: 7, y: 2 }  // Frame 4
+    ],
+    deadRight: [
+        { x: 2, y: 8 }, // Frame 2
+        { x: 2, y: 9 }, // Frame 3
+        { x: 3, y: 9 },  // Frame 4
+    ],
+    deadLeft: [
+        { x: 6, y: 8 }, // Frame 2
+        { x: 6, y: 9 }, // Frame 3
+        { x: 7, y: 9 },  // Frame 4
     ]
 };
 const charactertileSize = 32; // Taille de chaque case dans le tileset
 let currentDirection = 'left';
 let currentFrameIndex = 0;
-const frameRate = 10; // Nombre de frames par seconde
+let frameRate = 10; // Nombre de frames par seconde
 let frameTime = 0;
 
 //Enemy
@@ -138,6 +170,20 @@ const initialEnemies = [
     // new Enemy(x, y, size, speedX, speedY, enemyImage)
 ];
 
+// Fonction pour ajouter un ennemi
+function addEnemy() {
+    const newEnemy = new Enemy(gRI(0, canvas.width), gRI(0, canvas.height), gRI(20, 70), gRI(50, 300), gRI(50, 300), enemyImage);
+    enemies.push(newEnemy);
+}
+
+// Fonction pour enlever un ennemi spécifique
+function removeEnemy(enemy) {
+    const index = enemies.indexOf(enemy);
+    if (index > -1) {
+        enemies.splice(index, 1);
+    }
+}
+
 // Mettre à jour la position des ennemis
 function updateEnemies(deltaTime) {
     for (const enemy of enemies) {
@@ -151,9 +197,18 @@ function checkCollisions() {
     const collisionY = characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY;
     for (const enemy of enemies) {
         if (enemy.checkCollision(collisionX, collisionY, collisionBoxSize)) {
-            alert('Vous avez été touché par un ennemi !');
+            //alert('Vous avez été touché par un ennemi !');
             // Réinitialiser le jeu
-            location.reload();
+            enemies.length = 0;
+            currentFrameIndex = 0;
+            frameRate = 2;
+            isDead = true;
+            gameMusic.pause();
+            deathMusic.play();
+            if (currentDirection == 'right' || currentDirection == 'walkRight')
+                currentDirection = 'deadRight';
+            else if (currentDirection == 'left' || currentDirection == 'walkLeft')
+                currentDirection = 'deadLeft';
         }
     }
 }
@@ -187,19 +242,38 @@ function update(deltaTime) {
     let moveY = 0;
 
     // Mouvement
+    
     if ((keys['ArrowUp'] || keys['KeyW']) && characterY + (collisionBoxSize * 0.5) - characterSpeed * deltaTime >= 0) {
         moveY = -characterSpeed * deltaTime;
+        if (currentDirection == 'right')
+            currentDirection = 'walkRight';
+        if (currentDirection == 'left')
+            currentDirection = 'walkLeft';
     }
     if ((keys['ArrowDown'] || keys['KeyS']) && characterY + (collisionBoxSize * 1.5) + characterSpeed * deltaTime <= canvas.height) {
         moveY = characterSpeed * deltaTime;
+        if (currentDirection == 'right')
+            currentDirection = 'walkRight';
+        if (currentDirection == 'left')
+            currentDirection = 'walkLeft';
     }
     if ((keys['ArrowLeft'] || keys['KeyA']) && characterX + (collisionBoxSize * 0.5) - characterSpeed * deltaTime >= 0) {
         moveX = -characterSpeed * deltaTime;
-        currentDirection = 'left';
+        currentDirection = 'walkLeft';
     }
     if ((keys['ArrowRight'] || keys['KeyD']) && characterX + (collisionBoxSize * 1.5) + characterSpeed * deltaTime <= canvas.width) {
         moveX = characterSpeed * deltaTime;
+        currentDirection = 'walkRight';
+    }
+    if(moveX == 0 && moveY == 0 && currentDirection != 'right' && currentDirection == 'walkRight')
+    {
+        currentFrameIndex = 0;
         currentDirection = 'right';
+    }
+    else if(moveX == 0 && moveY == 0 && currentDirection != 'left' && currentDirection == 'walkLeft')
+    {
+        currentFrameIndex = 0;
+        currentDirection = 'left';
     }
     
     // Courir
@@ -234,6 +308,14 @@ function update(deltaTime) {
     }
     if (isCollisionBoxValid(characterX + (characterSize - collisionBoxSize) / 2, newCollisionY, collisionBoxSize, collisionBoxSize)) {
         characterY += moveY;
+    }
+}
+
+function updateDeath(deltaTime) {
+    if (currentFrameIndex == 2)
+    {
+        alert('Vous vous êtes pris un sacré coup !');
+        location.reload();
     }
 }
 
@@ -340,7 +422,10 @@ function gameLoop(timestamp) {
     let elapsedTime = (timestamp - startTime) / 1000;
     lastTime = timestamp;
 
-    update(deltaTime);
+    if (!isDead)
+        update(deltaTime);
+    else
+        updateDeath(deltaTime);
     updateCharacterAnimation(deltaTime);
     updateEnemies(deltaTime);
     draw();

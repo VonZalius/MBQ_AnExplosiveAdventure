@@ -57,3 +57,47 @@ h1 {
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
+
+.container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+canvas {
+    display: none;
+    margin-top: 20px;
+}
+
+#commands {
+    margin-top: 20px;
+    text-align: left;
+    display: inline-block;
+}
+
+#commands h2 {
+    margin-bottom: 10px;
+}
+
+#commands ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#commands li {
+    margin: 5px 0;
+}
+
+#commands strong {
+    display: inline-block;
+    width: 200px;
+}
+
+#version {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    font-size: 14px;
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
