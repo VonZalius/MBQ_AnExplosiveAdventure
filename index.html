@@ -5,11 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Une Aventure</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Ajoutez ce style pour rendre le score plus grand et ajouter un espace */
+        .score-container {
+            font-size: 2em; /* Taille de la police plus grande */
+            font-weight: bold; /* Met le texte en gras */
+            margin-bottom: 20px; /* Espace en bas */
+            text-align: center; /* Centrer le texte */
+            display: none; /* Masquer l'élément initialement */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bienvenue dans une Aventure</h1>
-        <button id="startButton">Commencer</button>
+        <h1>Une petite aventure commence...</h1>
+        <button id="startButton">Jouer</button>
+        <div class="score-container" id="score">Pièces collectées : 0</div> <!-- Ajout de l'élément score -->
         <canvas id="gameCanvas" width="800" height="800"></canvas>
         <audio id="backgroundMusic" src="src/mp3/Pixel 3.mp3" autoplay loop></audio>
         <audio id="gameMusic" src="src/mp3/Pixel 4.mp3" loop></audio>
@@ -26,10 +37,14 @@
             </ul>
         </div>
     </div>
-    <div id="version">Alpha 0.0.6</div>
+    <div id="version">Alpha 0.0.7</div>
     <script type="module" src="script.js"></script>
 </body>
 </html>
+
+
+
+
 
 
 

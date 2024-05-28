@@ -12,6 +12,16 @@ const deathMusic = document.getElementById('deathMusic');
 // Désactiver le lissage d'image pour préserver la netteté des sprites en pixel art
 context.imageSmoothingEnabled = false;
 
+// Suivre les touches enfoncées
+const keys = {};
+// Ajouter des écouteurs pour les événements de touche
+document.addEventListener('keydown', function(event) {
+    keys[event.code] = true;
+});
+document.addEventListener('keyup', function(event) {
+    keys[event.code] = false;
+});
+
 // ------------------------------------------------------------- INIT -------------------------------------------------------------
 
 let showCollision = false;
@@ -84,10 +94,6 @@ let currentFrameIndex = 0;
 let frameRate = 10; // Nombre de frames par seconde
 let frameTime = 0;
 
-//Enemy
-const enemyImage = new Image();
-enemyImage.src = 'src/mur.png';
-
 // MAPS
 let map;
 
@@ -123,27 +129,133 @@ const map2 = [
 
 //const m = gRI(1, 1);
 
-// Suivre les touches enfoncées
-const keys = {};
-// Ajouter des écouteurs pour les événements de touche
-document.addEventListener('keydown', function(event) {
-    keys[event.code] = true;
-});
-document.addEventListener('keyup', function(event) {
-    keys[event.code] = false;
-});
+// ------------------------------------------------------------- COINS -------------------------------------------------------------
+
+let score = 0;
+
+const coinImage = new Image();
+coinImage.src = 'src/coin.png'; // Assurez-vous d'avoir une image de pièce
+const coinFrames = {
+    spin: [
+        { x: 0, y: 0 }, // Frame 1
+        { x: 1, y: 0 }, // Frame 2
+        { x: 2, y: 0 }, // Frame 3
+        { x: 3, y: 0 },  // Frame 4
+        { x: 4, y: 0 }  // Frame 4
+    ]
+};
+const coinTileSize = 16; // Taille de chaque case dans le tileset de la pièce
+const coinFrameRate = 10; // Nombre de frames par seconde pour les pièces
+
+let currentCoin = null;
+
+class Coin {
+    constructor(x, y, size, image, frames, tileSize, frameRate) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.image = image;
+        this.frames = frames;
+        this.tileSize = tileSize;
+        this.frameRate = frameRate;
+        this.currentFrameIndex = 0;
+        this.frameTime = 0;
+    }
+
+    update(deltaTime) {
+        // Mettre à jour l'animation
+        this.frameTime += deltaTime;
+        if (this.frameTime >= 1 / this.frameRate) {
+            this.currentFrameIndex = (this.currentFrameIndex + 1) % this.frames.spin.length;
+            this.frameTime = 0;
+        }
+    }
+
+    draw(context) {
+        const frame = this.frames.spin[this.currentFrameIndex];
+        context.drawImage(
+            this.image,
+            frame.x * this.tileSize, frame.y * this.tileSize, this.tileSize, this.tileSize,
+            this.x, this.y, this.size, this.size
+        );
+        if (showCollision) {
+            this.drawCollisionBox(context);
+        }
+    }
+
+    drawCollisionBox(context) {
+        const collisionX = this.x + (this.size - this.size) / 2;
+        const collisionY = this.y + (this.size - this.size) / 2;
+        context.strokeStyle = 'red';
+        context.lineWidth = 2;
+        context.strokeRect(collisionX, collisionY, this.size, this.size);
+    }
+
+    checkCollision(characterX, characterY, characterSize) {
+        const coinCenterX = this.x + this.size / 2;
+        const coinCenterY = this.y + this.size / 2;
+        const characterCenterX = characterX + characterSize / 2;
+        const characterCenterY = characterY + characterSize / 2;
+        const distance = Math.sqrt(
+            Math.pow(coinCenterX - characterCenterX, 2) + Math.pow(coinCenterY - characterCenterY, 2)
+        );
+        return distance < (this.size / 2 + characterSize / 2);
+    }
+}
+
+function placeRandomCoin() {
+    const positions100 = getAllPositions(map, 900);
+    const randomPosition = getRandomPosition(positions100);
+    const tileWidth = canvas.width / map[0].length;
+    const tileHeight = canvas.height / map.length;
+    const coinSize = tileWidth * 0.8; // Taille de la pièce
+    currentCoin = new Coin(
+        randomPosition.col * tileWidth + (tileWidth - coinSize) / 2,
+        randomPosition.row * tileHeight + (tileHeight - coinSize) / 2,
+        coinSize,
+        coinImage,
+        coinFrames,
+        coinTileSize,
+        coinFrameRate
+    );
+}
+
+function updateScore() {
+    const scoreElement = document.getElementById('score');
+    scoreElement.textContent = `Pièces collectées : ${score}`;
+}
+
 
 // ------------------------------------------------------------- ENEMY -------------------------------------------------------------
 
+//Enemy
+const enemyImage = new Image();
+enemyImage.src = 'src/Impact.png';
+const enemyFrames = {
+    walk: [
+        { x: 16, y: 8 }, // Frame 1
+        { x: 17, y: 8 }, // Frame 2
+        { x: 18, y: 8 }, // Frame 3
+        { x: 19, y: 8 },  // Frame 4
+    ]
+};
+const enemyTileSize = 32; // Taille de chaque case dans le tileset de l'ennemi
+const enemyFrameRate = 10; // Nombre de frames par seconde pour les ennemis
+
 // Classe pour les ennemis
 class Enemy {
-    constructor(x, y, size, speedX, speedY, image) {
+    constructor(x, y, size, speedX, speedY, image, frames, tileSize, frameRate) {
         this.x = x;
         this.y = y;
         this.size = size;
         this.speedX = speedX;
         this.speedY = speedY;
         this.image = image;
+        this.frames = frames;
+        this.tileSize = tileSize;
+        this.frameRate = frameRate;
+        this.currentFrameIndex = 0;
+        this.frameTime = 0;
     }
 
     update(deltaTime) {
@@ -166,10 +278,22 @@ class Enemy {
             this.y = canvas.height - this.size;
             this.speedY = -this.speedY;
         }
+
+        // Mettre à jour l'animation
+        this.frameTime += deltaTime;
+        if (this.frameTime >= 1 / this.frameRate) {
+            this.currentFrameIndex = (this.currentFrameIndex + 1) % this.frames.walk.length;
+            this.frameTime = 0;
+        }
     }
 
     draw(context) {
-        context.drawImage(this.image, this.x, this.y, this.size, this.size);
+        const frame = this.frames.walk[this.currentFrameIndex];
+        context.drawImage(
+            this.image,
+            frame.x * this.tileSize, frame.y * this.tileSize, this.tileSize, this.tileSize,
+            this.x, this.y, this.size, this.size
+        );
     }
 
     checkCollision(characterX, characterY, characterSize) {
@@ -182,15 +306,16 @@ class Enemy {
     }
 }
 
+
 // Variables pour les ennemis
 const enemies = [];
 const initialEnemies = [
-    new Enemy(100, 100, gRI(20, 70), gRI(50, 300), gRI(50, 300), enemyImage),
-    new Enemy(700, 100, gRI(20, 70), -gRI(50, 300), gRI(50, 300), enemyImage),
-    new Enemy(100, 700, gRI(20, 70), gRI(50, 300), -gRI(50, 300), enemyImage),
-    new Enemy(700, 700, gRI(20, 70), -gRI(50, 300), -gRI(50, 300), enemyImage),
-    // new Enemy(x, y, size, speedX, speedY, enemyImage)
+    new Enemy(100, 100, gRI(50, 100), gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(700, 100, gRI(50, 100), -gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(100, 700, gRI(50, 100), gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(700, 700, gRI(50, 100), -gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
 ];
+
 
 // Fonction pour ajouter un ennemi
 function addEnemy() {
@@ -331,6 +456,17 @@ function update(deltaTime) {
     if (isCollisionBoxValid(characterX + (characterSize - collisionBoxSize) / 2, newCollisionY, collisionBoxSize, collisionBoxSize)) {
         characterY += moveY;
     }
+
+    // Vérifier les collisions avec les pièces
+    if (currentCoin && currentCoin.checkCollision(characterX + (characterSize - collisionBoxSize) / 2, characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY, collisionBoxSize)) {
+        score += 1;
+        updateScore();
+        placeRandomCoin();
+    }
+    // Mettre à jour l'animation de la pièce
+    if (currentCoin) {
+        currentCoin.update(deltaTime);
+    }
 }
 
 function updateDeath(deltaTime) {
@@ -341,11 +477,6 @@ function updateDeath(deltaTime) {
     }
 }
 
-// ------------------------------------------------------------- OTHER -------------------------------------------------------------
-
-function gRI(min, max) {
-    return Math.floor(Math.random() * (max - min) + min);
-}
 
 // ------------------------------------------------------------- DRAW -------------------------------------------------------------
 
@@ -392,7 +523,7 @@ function drawBackground(map) {
     const cols = map[0].length;
     const tileWidth = canvas.width / cols;
     const tileHeight = canvas.height / rows;
-
+    
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             let sprite = tileImages[900];
@@ -408,17 +539,14 @@ function drawBackground(map) {
 function drawMap(map) {
 
     drawBackground(map);
-
+    
     const rows = map.length;
     const cols = map[0].length;
     const tileWidth = canvas.width / cols;
     const tileHeight = canvas.height / rows;
 
-    // Calculer la position du personnage en termes de lignes et de colonnes
-    //const characterBaseX = characterX + characterSize; // Position en bas à droite du sprite
     const characterBaseY = characterY + characterSize - (characterSize / charactertileSize * characterFoot) - 3; // Position en bas à droite du sprite
     const characterRow = Math.floor(characterBaseY / tileHeight);
-    //const characterCol = Math.floor(characterBaseX / tileWidth);
 
     for (let row = 0; row < rows; row++)
     {
@@ -426,8 +554,8 @@ function drawMap(map) {
         {
             let tile = map[row][col];
             if (tile != 900)
-            {
-                let sprite = tileImages[tile];
+                {
+                    let sprite = tileImages[tile];
                 context.drawImage(
                     sprite.tileset,
                     sprite.x * tileSize, sprite.y * tileSize, (sprite.w * tileSize), (sprite.h * tileSize), // Source rectangle
@@ -442,6 +570,14 @@ function drawMap(map) {
             // Appeler drawCharacter juste après avoir dessiné la case du personnage
             if (row === characterRow) {
                 drawCharacter(characterX, characterY);
+            }
+
+            // Appeler drawCoin juste après avoir dessiné la case de la pièce
+            if (currentCoin) {
+                const coinRow = Math.floor(currentCoin.y / tileHeight);
+                if (row === coinRow) {
+                    currentCoin.draw(context);
+                }
             }
         }
     }
@@ -460,6 +596,29 @@ function drawEnemies() {
 function draw() {
     drawMap(map);
     drawEnemies();
+}
+
+// ------------------------------------------------------------- OTHER -------------------------------------------------------------
+
+function gRI(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+}
+
+function getAllPositions(map, tileValue) {
+    const positions = [];
+    for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+            if (map[row][col] === tileValue) {
+                positions.push({ row: row, col: col });
+            }
+        }
+    }
+    return positions;
+}
+
+function getRandomPosition(positions) {
+    const randomIndex = Math.floor(Math.random() * positions.length);
+    return positions[randomIndex];
 }
 
 // ------------------------------------------------------------- BASE -------------------------------------------------------------
@@ -488,27 +647,13 @@ if (elapsedTime < 3) {
 requestAnimationFrame(gameLoop);
 }
 
-function getAllPositions(map, tileValue) {
-    const positions = [];
-    for (let row = 0; row < map.length; row++) {
-        for (let col = 0; col < map[row].length; col++) {
-            if (map[row][col] === tileValue) {
-                positions.push({ row: row, col: col });
-            }
-        }
-    }
-    return positions;
-}
-
-function getRandomPosition(positions) {
-    const randomIndex = Math.floor(Math.random() * positions.length);
-    return positions[randomIndex];
-}
-
 // Démarrer le jeu
 function startGame() {
+    const scoreElement = document.getElementById('score');
+    scoreElement.style.display = 'block';
     startButton.style.display = 'none';
     canvas.style.display = 'block';
+    updateScore();
     requestAnimationFrame(gameLoop);
 
     backgroundMusic.pause();
@@ -540,6 +685,7 @@ function startGame() {
     // Ajouter les ennemis après 3 secondes
     setTimeout(() => {
         enemies.push(...initialEnemies);
+        placeRandomCoin();
     }, 3000);
 }
 
