@@ -93,6 +93,23 @@ const tileImages = {
     140: { tileset: tilesetGround, x: 2, y: 7 , w: 1, h: 1}, // Bord de l'eau S
     141: { tileset: tilesetGround, x: 1, y: 6 , w: 1, h: 1}, // Bord de l'eau O
 
+//-------
+
+    142: { tileset: tilesetGround, x: 5, y: 1 , w: 1, h: 1},  // Bord de falaise NE
+    143: { tileset: tilesetGround, x: 5, y: 4 , w: 1, h: 1},  // Bord de falaise SE
+    144: { tileset: tilesetGround, x: 1, y: 4 , w: 1, h: 1},  // Bord de falaise SO
+    145: { tileset: tilesetGround, x: 1, y: 1 , w: 1, h: 1},  // Bord de falaise NO
+
+    146: { tileset: tilesetGround, x: 7, y: 1 , w: 1, h: 1},  // Bord de falaise intérieur NE
+    147: { tileset: tilesetGround, x: 7, y: 2 , w: 1, h: 1},  // Bord de falaise intérieur SE
+    148: { tileset: tilesetGround, x: 6, y: 2 , w: 1, h: 1},  // Bord de falaise intérieur SO
+    149: { tileset: tilesetGround, x: 6, y: 1 , w: 1, h: 1},  // Bord de falaise intérieur NO
+
+    150: { tileset: tilesetGround, x: 2, y: 1 , w: 1, h: 1},  // Bord de falaise N
+    151: { tileset: tilesetGround, x: 5, y: 2 , w: 1, h: 1},  // Bord de falaise E
+    152: { tileset: tilesetGround, x: 2, y: 4 , w: 1, h: 1}, // Bord de falaise S
+    153: { tileset: tilesetGround, x: 1, y: 2 , w: 1, h: 1}, // Bord de falaise O
+
 // --------------------------------------- WALL ---------------------------------------
 
     200: { tileset: tilesetWall, x: 1, y: 5 , w: 1, h: 2},  // Mur seul
@@ -113,10 +130,10 @@ const tileImages = {
     213: { tileset: tilesetWall, x: 10, y: 5 , w: 1, h: 2}, // Mur EO suite 2-2
     214: { tileset: tilesetWall, x: 11, y: 5 , w: 1, h: 2},  // Mur EO suite 2-3
 
-    215: { tileset: tilesetWall, x: 5, y: 10 , w: 1, h: 1},  // Mur NE
+    215: { tileset: tilesetWall, x: 5, y: 9 , w: 1, h: 2},  // Mur NE
     216: { tileset: tilesetWall, x: 5, y: 5 , w: 1, h: 2},  // Mur SE
     217: { tileset: tilesetWall, x: 7, y: 5 , w: 1, h: 2},  // Mur SO
-    218: { tileset: tilesetWall, x: 7, y: 10 , w: 1, h: 1},  // Mur NO
+    218: { tileset: tilesetWall, x: 7, y: 9 , w: 1, h: 2},  // Mur NO
 
     219: { tileset: tilesetWall, x: 6, y: 5 , w: 1, h: 2},  // Mur croisement xN
     220: { tileset: tilesetWall, x: 7, y: 7 , w: 1, h: 2},  // Mur croisement xE

@@ -5,23 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Une Aventure</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Ajoutez ce style pour rendre le score plus grand et ajouter un espace */
-        .score-container {
-            font-size: 2em; /* Taille de la police plus grande */
-            font-weight: bold; /* Met le texte en gras */
-            margin-bottom: 20px; /* Espace en bas */
-            text-align: center; /* Centrer le texte */
-            display: none; /* Masquer l'élément initialement */
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <h1>Une petite aventure commence...</h1>
         <button id="startButton">Jouer</button>
-        <div class="score-container" id="score">Pièces collectées : 0</div> <!-- Ajout de l'élément score -->
+        <div class="score-container" id="score">Pièces collectées : 0</div>
         <canvas id="gameCanvas" width="800" height="800"></canvas>
+        <button id="retryButton">Revenir au menu principal</button>
         <audio id="backgroundMusic" src="src/mp3/Pixel 3.mp3" loop></audio>
         <audio id="gameMusic" src="src/mp3/Pixel 4.mp3" loop></audio>
         <audio id="deathMusic" src="src/mp3/Pixel 7.mp3" loop></audio>
@@ -42,15 +33,12 @@
                 <li><strong>Shift :</strong> Montrer les hitboxes</li>
             </ul>
         </div>
+        <div class="volume-control">
+            <label for="volume">Volume :</label>
+            <input type="range" id="volume" name="volume" min="0" max="1" step="0.01" value="0.5">
+        </div>
     </div>
-    <div id="version">Alpha 0.0.8</div>
+    <div id="version">Alpha 0.1.0</div>
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-

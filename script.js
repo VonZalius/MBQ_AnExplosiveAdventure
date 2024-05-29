@@ -29,6 +29,42 @@ document.addEventListener('keyup', function(event) {
     keys[event.code] = false;
 });
 
+// ------------------------------------------------------------- VOLUME -------------------------------------------------------------
+
+let currentVolume = 0.5; // Volume initial
+
+// Obtenez l'élément input de contrôle du volume
+const volumeControl = document.getElementById('volume');
+
+// Liste des éléments audio
+const audioElements = [
+    document.getElementById('backgroundMusic'),
+    document.getElementById('gameMusic'),
+    document.getElementById('deathMusic'),
+    document.getElementById('deathSound'),
+    document.getElementById('coinSound'),
+    document.getElementById('magicSound'),
+    document.getElementById('blopSound'),
+    document.getElementById('impactSound'),
+    document.getElementById('footStepSound')
+];
+
+// Fonction pour mettre à jour le volume de tous les éléments audio
+function updateVolume() {
+    currentVolume = volumeControl.value; // Mettre à jour la variable globale
+    audioElements.forEach(audio => {
+        audio.volume = currentVolume;
+    });
+}
+
+
+// Ajoutez un écouteur d'événements pour modifier le volume lorsque l'utilisateur change la valeur de la barre de volume
+volumeControl.addEventListener('input', updateVolume);
+
+// Appelez la fonction pour définir le volume initial
+updateVolume();
+
+
 // ------------------------------------------------------------- INIT -------------------------------------------------------------
 
 let showCollision = false;
@@ -37,12 +73,12 @@ let showCollision = false;
 let characterSize = 0;
 const baseCharacterSize = 150; // Taille du personnage pour une carte de 10 cases
 const baseMapSize = 10; // Taille de la carte de base (10 cases)
-let collisionBoxSize = 50; // Taille de la boîte de collision du personnage
-let collisionOffsetY = 30;
+let collisionBoxSize = 6; // Taille de la boîte de collision du personnage
+let collisionOffsetY = 3.5;
 let characterX = canvas.width / 2 - characterSize / 2;
 let characterY = canvas.height / 2 - characterSize / 2;
-let characterWalkSpeed = 0; // Pixels par seconde
-let characterRunSpeed = 0; // Pixels par seconde
+let characterWalkSpeed = 4; // Pixels par seconde
+let characterRunSpeed = 2.5; // Pixels par seconde
 let characterSpeed = 300; // Pixels par seconde
 let isDead = false;
 
@@ -108,26 +144,26 @@ let frameTime = 0;
 let map;
 
 const map1 = [
- [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
- [101, 900, 305, 301, 312, 900, 313, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 314, 900, 900, 301, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 301, 900, 900, 900, 301, 900, 900, 900, 900, 216, 212, 209, 213, 214, 212, 217, 900, 900, 101],
- [101, 216, 224, 900, 900, 208, 219, 209, 213, 214, 220, 305, 304, 900, 900, 900, 203, 900, 900, 101],
- [101, 202, 900, 900, 900, 304, 203, 900, 900, 301, 202, 900, 900, 900, 900, 900, 202, 900, 900, 101],
- [101, 900, 301, 900, 900, 900, 202, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
- [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101]
+ [100, 100, 100, 100, 304, 100, 100, 149, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 146, 100],
+ [301, 149, 152, 152, 152, 152, 152, 143, 305, 900, 900, 900, 900, 900, 301, 314, 312, 900, 144, 146],
+ [149, 143, 305, 301, 312, 900, 313, 900, 900, 900, 900, 301, 900, 900, 900, 900, 900, 900, 301, 153],
+ [151, 301, 900, 900, 900, 900, 900, 900, 314, 900, 216, 212, 209, 213, 214, 212, 217, 900, 900, 153],
+ [151, 900, 900, 900, 900, 301, 900, 900, 900, 900, 203, 305, 304, 900, 310, 900, 203, 900, 900, 144],
+ [151, 216, 224, 900, 900, 208, 219, 209, 213, 214, 220, 900, 900, 900, 900, 900, 202, 900, 208, 217],
+ [151, 202, 900, 900, 900, 304, 203, 900, 900, 301, 202, 900, 900, 900, 900, 900, 900, 900, 900, 203],
+ [151, 900, 301, 900, 900, 900, 202, 306, 900, 900, 900, 900, 900, 900, 208, 212, 217, 900, 900, 203],
+ [151, 900, 900, 900, 900, 307, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 203, 900, 900, 202],
+ [151, 306, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 305, 900, 216, 218, 900, 900, 307],
+ [151, 900, 900, 900, 900, 900, 208, 217, 900, 900, 306, 900, 900, 900, 900, 203, 900, 900, 300, 100],
+ [148, 142, 900, 900, 900, 900, 311, 203, 900, 900, 900, 900, 900, 900, 300, 203, 900, 900, 900, 149],
+ [300, 151, 900, 307, 900, 900, 900, 215, 224, 900, 208, 212, 209, 213, 214, 218, 300, 900, 900, 151],
+ [305, 151, 900, 900, 137, 134, 900, 900, 900, 900, 900, 304, 300, 900, 900, 900, 900, 900, 900, 151],
+ [149, 143, 900, 137, 131, 132, 140, 134, 900, 900, 900, 900, 900, 900, 300, 900, 900, 900, 300, 151],
+ [143, 900, 900, 136, 130, 101, 101, 132, 140, 134, 900, 900, 900, 900, 900, 900, 900, 300, 900, 151],
+ [300, 900, 900, 304, 136, 138, 130, 101, 133, 135, 300, 900, 900, 304, 900, 900, 900, 900, 900, 151],
+ [304, 900, 900, 900, 300, 900, 136, 138, 135, 305, 900, 900, 300, 900, 900, 900, 300, 900, 149, 143],
+ [216, 207, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 149, 152, 152, 152, 143, 149],
+ [202, 100, 300, 305, 149, 152, 152, 152, 152, 152, 152, 152, 152, 152, 143, 300, 149, 152, 152, 143]
 ];
 
 // MAPS
@@ -367,7 +403,7 @@ function checkCollisions() {
             currentFrameIndex = 0;
             frameRate = 2;
             isDead = true;
-            deathSound.play(); // Jouer le son de mort
+            playSound(deathSound); // Jouer le son de mort
             gameMusic.pause();
             deathMusic.play();
             if (currentDirection == 'right' || currentDirection == 'walkRight')
@@ -489,7 +525,7 @@ function update(deltaTime, timestamp) {
     // Vérifier les collisions avec les pièces
     if (currentCoin && currentCoin.checkCollision(characterX + (characterSize - collisionBoxSize) / 2, characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY, collisionBoxSize)) {
         score += 1;
-        coinSound.play(); // Jouer le son de pièce
+        playSound(coinSound); // Jouer le son de pièce
         updateScore();
         placeRandomCoin();
     }
@@ -499,16 +535,21 @@ function update(deltaTime, timestamp) {
     }
 }
 
-
+// ------------------------------------------------------------- DEATH -------------------------------------------------------------
 
 function updateDeath(deltaTime) {
-    if (currentFrameIndex == 2)
-    {
-        alert('Vous vous êtes pris un sacré coup !');
-        location.reload();
+    if (currentFrameIndex == 2) {
+        frameRate = 0;
+        // Afficher le bouton de retour au menu principal
+        const retryButton = document.getElementById('retryButton');
+        retryButton.style.display = 'block';
     }
 }
 
+// Ajouter un écouteur d'événements au bouton pour recharger la page
+document.getElementById('retryButton').addEventListener('click', function() {
+    location.reload();
+});
 
 // ------------------------------------------------------------- DRAW -------------------------------------------------------------
 
@@ -560,14 +601,14 @@ function drawBackground(map) {
         for (let col = 0; col < cols; col++) {
             let sprite = tileImages[900];
             let tile = map[row][col];
-            if(tile != 100)
-            {
+            /*if(tile != 100)
+            {*/
                 context.drawImage(
                     sprite.tileset,
                     sprite.x * tileSize, sprite.y * tileSize, (sprite.w * tileSize), (sprite.h * tileSize), // Source rectangle
                     tileWidth * (col - sprite.w + 1), tileHeight * (row - sprite.h + 1), sprite.w * tileWidth, (sprite.h * tileHeight) // Destination rectangle
                 );
-            }
+            //}
         }
     }
 }
@@ -659,8 +700,10 @@ function getRandomPosition(positions) {
 
 function playSound(sound) {
     const soundClone = sound.cloneNode();
+    soundClone.volume = currentVolume; // Définir le volume du clone
     soundClone.play();
 }
+
 
 // ------------------------------------------------------------- BASE -------------------------------------------------------------
 
@@ -681,7 +724,7 @@ updateCharacterAnimation(deltaTime);
 updateEnemies(deltaTime);
 draw();
 if (elapsedTime < 3) {
-    drawMessage("Ready?");
+    drawMessage("Preparez-vous...");
 } else {
     checkCollisions();
 }
@@ -701,17 +744,17 @@ function startGame() {
     backgroundMusic.src = '';
     gameMusic.play();
 
-    const m = gRI(1, 3);
+    const m = gRI(1, 2);
     if (m ==1)
         map = map1;
     if (m ==2)
         map = map2;
 
     characterSize = baseCharacterSize * (baseMapSize / map.length);
-    collisionBoxSize = characterSize / 3; // Taille de la boîte de collision du personnage
-    collisionOffsetY = characterSize / 5;
-    characterWalkSpeed = characterSize / 5 * 10;
-    characterRunSpeed = characterSize / 3 * 10;
+    collisionBoxSize = characterSize / collisionBoxSize; // Taille de la boîte de collision du personnage
+    collisionOffsetY = characterSize / collisionOffsetY;
+    characterWalkSpeed = characterSize / characterWalkSpeed * 10;
+    characterRunSpeed = characterSize / characterRunSpeed * 10;
 
     // Obtenir toutes les positions des cases 900
     const positions900 = getAllPositions(map, 900);
@@ -723,12 +766,12 @@ function startGame() {
     characterX = randomPosition.col * tileWidth - (tileWidth/2);
     characterY = randomPosition.row * tileHeight - (tileHeight);
 
-    blopSound.play();
+    playSound(blopSound);
     // Ajouter les ennemis après 3 secondes
     setTimeout(() => {
         enemies.push(...initialEnemies);
         placeRandomCoin();
-        impactSound.play();
+        playSound(impactSound);
     }, 3000);
 }
 
