@@ -4,10 +4,17 @@ import { tilesetGround, tileSize, tileImages } from './tiles.js';
 const startButton = document.getElementById('startButton');
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
+
 const backgroundMusic = document.getElementById('backgroundMusic');
 const gameMusic = document.getElementById('gameMusic');
 const deathMusic = document.getElementById('deathMusic');
 
+const deathSound = document.getElementById('deathSound');
+const coinSound = document.getElementById('coinSound');
+const magicSound = document.getElementById('magicSound');
+const blopSound = document.getElementById('blopSound');
+const impactSound = document.getElementById('impactSound');
+const footStepSound = document.getElementById('footStepSound');
 
 // Désactiver le lissage d'image pour préserver la netteté des sprites en pixel art
 context.imageSmoothingEnabled = false;
@@ -38,6 +45,9 @@ let characterWalkSpeed = 0; // Pixels par seconde
 let characterRunSpeed = 0; // Pixels par seconde
 let characterSpeed = 300; // Pixels par seconde
 let isDead = false;
+
+let lastFootstepTime = 0;
+let footstepInterval = 0.5; // Intervalle de base pour la marche (en secondes)
 
 // Charger les images
 //Player
@@ -98,19 +108,26 @@ let frameTime = 0;
 let map;
 
 const map1 = [
-    [101, 133, 138, 138, 138, 138, 138, 138, 130, 101, 101, 101, 101],
-    [133, 135, 900, 900, 900, 900, 900, 900, 136, 130, 101, 101, 101],
-    [141, 900, 900, 900, 301, 900, 300, 900, 900, 139, 101, 101, 101],
-    [141, 900, 302, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
-    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
-    [141, 900, 900, 900, 900, 900, 900, 303, 900, 139, 101, 101, 101],
-    [141, 900, 305, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
-    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139, 101, 101, 101],
-    [132, 134, 900, 900, 900, 900, 304, 900, 137, 131, 101, 101, 101],
-    [101, 132, 140, 140, 140, 140, 140, 140, 131, 101, 101, 101, 101],
-    [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
-    [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
-    [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101]
+ [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
+ [101, 900, 305, 301, 312, 900, 313, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 314, 900, 900, 301, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 301, 900, 900, 900, 301, 900, 900, 900, 900, 216, 212, 209, 213, 214, 212, 217, 900, 900, 101],
+ [101, 216, 224, 900, 900, 208, 219, 209, 213, 214, 220, 305, 304, 900, 900, 900, 203, 900, 900, 101],
+ [101, 202, 900, 900, 900, 304, 203, 900, 900, 301, 202, 900, 900, 900, 900, 900, 202, 900, 900, 101],
+ [101, 900, 301, 900, 900, 900, 202, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 900, 101],
+ [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101]
 ];
 
 // MAPS
@@ -350,6 +367,7 @@ function checkCollisions() {
             currentFrameIndex = 0;
             frameRate = 2;
             isDead = true;
+            deathSound.play(); // Jouer le son de mort
             gameMusic.pause();
             deathMusic.play();
             if (currentDirection == 'right' || currentDirection == 'walkRight')
@@ -384,14 +402,18 @@ function isCollisionBoxValid(x, y, width, height) {
 }
 
 // Mettre à jour la position du personnage
-function update(deltaTime) {
+function update(deltaTime, timestamp) {
     let moveX = 0;
     let moveY = 0;
 
+    // Déterminer la cadence en fonction de la vitesse de déplacement
+    footstepInterval = (keys['Space']) ? 0.2 : 0.4; // Réduire l'intervalle lorsque le personnage court
+
     // Mouvement
-    
+    let moving = false;
     if ((keys['ArrowUp'] || keys['KeyW']) && characterY + (collisionBoxSize * 0.5) - characterSpeed * deltaTime >= 0) {
         moveY = -characterSpeed * deltaTime;
+        moving = true;
         if (currentDirection == 'right')
             currentDirection = 'walkRight';
         if (currentDirection == 'left')
@@ -399,6 +421,7 @@ function update(deltaTime) {
     }
     if ((keys['ArrowDown'] || keys['KeyS']) && characterY + (collisionBoxSize * 1.5) + characterSpeed * deltaTime <= canvas.height) {
         moveY = characterSpeed * deltaTime;
+        moving = true;
         if (currentDirection == 'right')
             currentDirection = 'walkRight';
         if (currentDirection == 'left')
@@ -406,19 +429,19 @@ function update(deltaTime) {
     }
     if ((keys['ArrowLeft'] || keys['KeyA']) && characterX + (collisionBoxSize * 0.5) - characterSpeed * deltaTime >= 0) {
         moveX = -characterSpeed * deltaTime;
+        moving = true;
         currentDirection = 'walkLeft';
     }
     if ((keys['ArrowRight'] || keys['KeyD']) && characterX + (collisionBoxSize * 1.5) + characterSpeed * deltaTime <= canvas.width) {
         moveX = characterSpeed * deltaTime;
+        moving = true;
         currentDirection = 'walkRight';
     }
-    if(moveX == 0 && moveY == 0 && currentDirection != 'right' && currentDirection == 'walkRight')
-    {
+    if(moveX == 0 && moveY == 0 && currentDirection != 'right' && currentDirection == 'walkRight') {
         currentFrameIndex = 0;
         currentDirection = 'right';
     }
-    else if(moveX == 0 && moveY == 0 && currentDirection != 'left' && currentDirection == 'walkLeft')
-    {
+    else if(moveX == 0 && moveY == 0 && currentDirection != 'left' && currentDirection == 'walkLeft') {
         currentFrameIndex = 0;
         currentDirection = 'left';
     }
@@ -457,9 +480,16 @@ function update(deltaTime) {
         characterY += moveY;
     }
 
+    // Jouer le son de pas si le personnage se déplace et que l'intervalle est écoulé
+    if (moving && (timestamp - lastFootstepTime) / 1000 > footstepInterval) {
+        playSound(footStepSound);
+        lastFootstepTime = timestamp;
+    }
+
     // Vérifier les collisions avec les pièces
     if (currentCoin && currentCoin.checkCollision(characterX + (characterSize - collisionBoxSize) / 2, characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY, collisionBoxSize)) {
         score += 1;
+        coinSound.play(); // Jouer le son de pièce
         updateScore();
         placeRandomCoin();
     }
@@ -468,6 +498,8 @@ function update(deltaTime) {
         currentCoin.update(deltaTime);
     }
 }
+
+
 
 function updateDeath(deltaTime) {
     if (currentFrameIndex == 2)
@@ -527,11 +559,15 @@ function drawBackground(map) {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             let sprite = tileImages[900];
-            context.drawImage(
-                sprite.tileset,
-                sprite.x * tileSize, sprite.y * tileSize, (sprite.w * tileSize), (sprite.h * tileSize), // Source rectangle
-                tileWidth * (col - sprite.w + 1), tileHeight * (row - sprite.h + 1), sprite.w * tileWidth, (sprite.h * tileHeight) // Destination rectangle
-            );
+            let tile = map[row][col];
+            if(tile != 100)
+            {
+                context.drawImage(
+                    sprite.tileset,
+                    sprite.x * tileSize, sprite.y * tileSize, (sprite.w * tileSize), (sprite.h * tileSize), // Source rectangle
+                    tileWidth * (col - sprite.w + 1), tileHeight * (row - sprite.h + 1), sprite.w * tileWidth, (sprite.h * tileHeight) // Destination rectangle
+                );
+            }
         }
     }
 }
@@ -621,6 +657,11 @@ function getRandomPosition(positions) {
     return positions[randomIndex];
 }
 
+function playSound(sound) {
+    const soundClone = sound.cloneNode();
+    soundClone.play();
+}
+
 // ------------------------------------------------------------- BASE -------------------------------------------------------------
 
 // Boucle de jeu
@@ -633,7 +674,7 @@ function gameLoop(timestamp) {
     lastTime = timestamp;
 
     if (!isDead)
-        update(deltaTime);
+        update(deltaTime, timestamp);
     else
     updateDeath(deltaTime);
 updateCharacterAnimation(deltaTime);
@@ -682,10 +723,12 @@ function startGame() {
     characterX = randomPosition.col * tileWidth - (tileWidth/2);
     characterY = randomPosition.row * tileHeight - (tileHeight);
 
+    blopSound.play();
     // Ajouter les ennemis après 3 secondes
     setTimeout(() => {
         enemies.push(...initialEnemies);
         placeRandomCoin();
+        impactSound.play();
     }, 3000);
 }
 
