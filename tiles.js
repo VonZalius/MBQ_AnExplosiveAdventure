@@ -23,6 +23,7 @@ const tileImages = {
 // --------------------------------------- GROUND ---------------------------------------
 
     900: { tileset: tilesetGround, x: 2, y: 2 , w: 1, h: 1},  // Sol
+
     901: { tileset: tilesetGround, x: 8, y: 1 , w: 1, h: 1},  // Sol
     902: { tileset: tilesetGround, x: 9, y: 1 , w: 1, h: 1},  // Sol
     903: { tileset: tilesetGround, x: 10, y: 1 , w: 1, h: 1},  // Sol
@@ -35,6 +36,31 @@ const tileImages = {
     910: { tileset: tilesetGround, x: 11, y: 3 , w: 1, h: 1},  // Sol
     911: { tileset: tilesetGround, x: 10, y: 4 , w: 1, h: 1},  // Sol
     912: { tileset: tilesetGround, x: 11, y: 4 , w: 1, h: 1},  // Sol0
+
+//-------
+    
+    913: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun NE
+    914: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun SE
+    915: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun SO
+    916: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun NO
+    
+    917: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge NE
+    918: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge SE
+    919: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge SO
+    920: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge NO
+    
+    921: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose NE
+    922: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose SE
+    923: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose SO
+    924: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose NO
+    
+    925: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair NE
+    926: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair SE
+    927: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair SO
+    928: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair NO
+
+//-------
+
     100: { tileset: tilesetGround, x: 0, y: 0 , w: 1, h: 1},
     101: { tileset: tilesetGround, x: 4, y: 7 , w: 1, h: 1},  // Eau
 
@@ -190,27 +216,6 @@ const tileImages = {
     314: { tileset: tilesetTree, x: 4, y: 7 , w: 1, h: 2},  // Tombe 3
     315: { tileset: tilesetTree, x: 6, y: 8 , w: 1, h: 1},  // Feu de camp éteint
 
-//-------
-
-    316: { tileset: tilesetTree, x: 0, y: 0 },  // Champignon Brun NE
-    317: { tileset: tilesetTree, x: 0, y: 0 },  // Champignon Brun SE
-    318: { tileset: tilesetTree, x: 0, y: 0 },  // Champignon Brun SO
-    319: { tileset: tilesetTree, x: 0, y: 0 },  // Champignon Brun NO
-
-    320: { tileset: tilesetTree, x: 0, y: 0 }, // Champignon Rouge NE
-    321: { tileset: tilesetTree, x: 0, y: 0 }, // Champignon Rouge SE
-    322: { tileset: tilesetTree, x: 0, y: 0 }, // Champignon Rouge SO
-    323: { tileset: tilesetTree, x: 0, y: 0 }, // Champignon Rouge NO
-
-    324: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Rose NE
-    325: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Rose SE
-    326: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Rose SO
-    327: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Rose NO
-
-    328: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Bleu clair NE
-    329: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Bleu clair SE
-    330: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Bleu clair SO
-    331: { tileset: tilesetTree, x: 0, y: 0 },  // Fleur Bleu clair NO
 
 // --------------------------------------- BRIDGE 1 ---------------------------------------
 

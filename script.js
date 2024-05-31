@@ -29,6 +29,31 @@ document.addEventListener('keyup', function(event) {
     keys[event.code] = false;
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const startButton = document.getElementById('startButton');
+    const retryButton = document.getElementById('retryButton');
+    const mainMenu = document.getElementById('mainMenu');
+    const gameSection = document.getElementById('gameSection');
+    const gameCanvas = document.getElementById('gameCanvas');
+    const score = document.getElementById('score');
+
+    startButton.addEventListener('click', () => {
+        mainMenu.style.display = 'none';
+        gameSection.style.display = 'flex';
+        gameCanvas.style.display = 'block';
+        score.style.display = 'block';
+        // Start game logic here
+    });
+
+    retryButton.addEventListener('click', () => {
+        mainMenu.style.display = 'flex';
+        gameSection.style.display = 'none';
+        gameCanvas.style.display = 'none';
+        score.style.display = 'none';
+        // Reset game logic here
+    });
+});
+
 // ------------------------------------------------------------- VOLUME -------------------------------------------------------------
 
 let currentVolume = 0.5; // Volume initial
@@ -261,7 +286,7 @@ function placeRandomCoin() {
     const randomPosition = getRandomPosition(positions100);
     const tileWidth = canvas.width / map[0].length;
     const tileHeight = canvas.height / map.length;
-    const coinSize = tileWidth * 0.8; // Taille de la pièce
+    const coinSize = tileWidth; // Taille de la pièce
     currentCoin = new Coin(
         randomPosition.col * tileWidth + (tileWidth - coinSize) / 2,
         randomPosition.row * tileHeight + (tileHeight - coinSize) / 2,
@@ -416,6 +441,8 @@ function checkCollisions() {
 
 // ------------------------------------------------------------- UPDATE -------------------------------------------------------------
 
+let hasBeenRelease = true;
+
 // Vérifier si une position est valide (ne contient pas d'obstacle)
 function isPositionValid(collisionX, collisionY) {
     const row = Math.floor(collisionY / (canvas.height / map.length));
@@ -424,7 +451,7 @@ function isPositionValid(collisionX, collisionY) {
         return false;
     }
     const tile = map[row][col];
-    return tile == 900;
+    return tile >= 900 /* tile == XXX */;
 }
 
 // Vérifier si une boîte de collision est entièrement dans une position valide
@@ -491,11 +518,17 @@ function update(deltaTime, timestamp) {
     }
 
     // Montrer les collisions
-    if (keys['ShiftLeft']) {
+    if (keys['ShiftLeft'] &&  showCollision == false && hasBeenRelease == true) {
         showCollision = true;
+        hasBeenRelease = false;
     }
-    if (!keys['ShiftLeft']) {
+    else if (keys['ShiftLeft'] &&  showCollision == true && hasBeenRelease == true) {
         showCollision = false;
+        hasBeenRelease = false;
+    }
+    if (!keys['ShiftLeft'])
+    {
+        hasBeenRelease = true;
     }
 
     // Ajuster la vitesse en diagonale
@@ -631,7 +664,7 @@ function drawMap(map) {
         {
             let tile = map[row][col];
             if (tile != 900)
-                {
+            {
                     let sprite = tileImages[tile];
                 context.drawImage(
                     sprite.tileset,
@@ -640,7 +673,7 @@ function drawMap(map) {
                 );
 
                 // Dessiner la boîte de collision des murs
-                if (showCollision)
+                if (showCollision && (tile < 900))
                     drawCollisionBox(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
             }
 
