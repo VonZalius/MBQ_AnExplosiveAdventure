@@ -24,45 +24,48 @@ const tileImages = {
 
     900: { tileset: tilesetGround, x: 2, y: 2 , w: 1, h: 1},  // Sol
 
-    901: { tileset: tilesetGround, x: 8, y: 1 , w: 1, h: 1},  // Sol
-    902: { tileset: tilesetGround, x: 9, y: 1 , w: 1, h: 1},  // Sol
-    903: { tileset: tilesetGround, x: 10, y: 1 , w: 1, h: 1},  // Sol
-    904: { tileset: tilesetGround, x: 11, y: 1 , w: 1, h: 1},  // Sol
-    905: { tileset: tilesetGround, x: 8, y: 2 , w: 1, h: 1},  // Sol
-    906: { tileset: tilesetGround, x: 9, y: 2 , w: 1, h: 1},  // Sol
-    907: { tileset: tilesetGround, x: 10, y: 2 , w: 1, h: 1},  // Sol
-    908: { tileset: tilesetGround, x: 11, y: 2 , w: 1, h: 1},  // Sol
-    909: { tileset: tilesetGround, x: 10, y: 3 , w: 1, h: 1},  // Sol
-    910: { tileset: tilesetGround, x: 11, y: 3 , w: 1, h: 1},  // Sol
-    911: { tileset: tilesetGround, x: 10, y: 4 , w: 1, h: 1},  // Sol
-    912: { tileset: tilesetGround, x: 11, y: 4 , w: 1, h: 1},  // Sol0
+    901: { tileset: tilesetGround, x: 8, y: 1 , w: 1, h: 1},  // Sol BIG
+    902: { tileset: tilesetGround, x: 9, y: 1 , w: 1, h: 1},  // Sol BIG
+    903: { tileset: tilesetGround, x: 8, y: 2 , w: 1, h: 1},  // Sol BIG
+    904: { tileset: tilesetGround, x: 9, y: 2 , w: 1, h: 1},  // Sol BIG
+    905: { tileset: tilesetGround, x: 10, y: 1 , w: 1, h: 1},  // Sol herbe
+    906: { tileset: tilesetGround, x: 11, y: 1 , w: 1, h: 1},  // Sol herbe
+    907: { tileset: tilesetGround, x: 10, y: 2 , w: 1, h: 1},  // Sol herbe
+    908: { tileset: tilesetGround, x: 11, y: 2 , w: 1, h: 1},  // Sol herbe
+    909: { tileset: tilesetGround, x: 10, y: 3 , w: 1, h: 1},  // Sol herbe
+    910: { tileset: tilesetGround, x: 11, y: 3 , w: 1, h: 1},  // Sol herbe
+    911: { tileset: tilesetGround, x: 10, y: 4 , w: 1, h: 1},  // Sol herbe
+    912: { tileset: tilesetGround, x: 11, y: 4 , w: 1, h: 1},  // Sol herbe
 
 //-------
     
-    913: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun NE
-    914: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun SE
-    915: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun SO
-    916: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Champignon Brun NO
+    913: { tileset: tilesetTree, x: 8, y: 1 , w: 1, h: 1},  // Champignon Brun NE
+    914: { tileset: tilesetTree, x: 8, y: 2 , w: 1, h: 1},  // Champignon Brun SE
+    915: { tileset: tilesetTree, x: 7, y: 2 , w: 1, h: 1},  // Champignon Brun SO
+    916: { tileset: tilesetTree, x: 7, y: 1 , w: 1, h: 1},  // Champignon Brun NO
     
-    917: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge NE
-    918: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge SE
-    919: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge SO
-    920: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1}, // Champignon Rouge NO
+    917: { tileset: tilesetTree, x: 10, y: 1 , w: 1, h: 1}, // Champignon Rouge NE
+    918: { tileset: tilesetTree, x: 10, y: 2 , w: 1, h: 1}, // Champignon Rouge SE
+    919: { tileset: tilesetTree, x: 9, y: 2 , w: 1, h: 1}, // Champignon Rouge SO
+    920: { tileset: tilesetTree, x: 9, y: 1 , w: 1, h: 1}, // Champignon Rouge NO
     
-    921: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose NE
-    922: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose SE
-    923: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose SO
-    924: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Rose NO
+    921: { tileset: tilesetTree, x: 10, y: 3 , w: 1, h: 1},  // Fleur Rose NE
+    922: { tileset: tilesetTree, x: 10, y: 4 , w: 1, h: 1},  // Fleur Rose SE
+    923: { tileset: tilesetTree, x: 9, y: 4 , w: 1, h: 1},  // Fleur Rose SO
+    924: { tileset: tilesetTree, x: 9, y: 3 , w: 1, h: 1},  // Fleur Rose NO
     
-    925: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair NE
-    926: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair SE
-    927: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair SO
-    928: { tileset: tilesetTree, x: 0, y: 0 , w: 1, h: 1},  // Fleur Bleu clair NO
+    925: { tileset: tilesetTree, x: 10, y: 5 , w: 1, h: 1},  // Fleur Bleu clair NE
+    926: { tileset: tilesetTree, x: 10, y: 6 , w: 1, h: 1},  // Fleur Bleu clair SE
+    927: { tileset: tilesetTree, x: 9, y: 6 , w: 1, h: 1},  // Fleur Bleu clair SO
+    928: { tileset: tilesetTree, x: 9, y: 5 , w: 1, h: 1},  // Fleur Bleu clair NO
 
 //-------
 
-    100: { tileset: tilesetGround, x: 0, y: 0 , w: 1, h: 1},
+
+
+    100: { tileset: tilesetGround, x: 0, y: 0 , w: 1, h: 1}, //NOP
     101: { tileset: tilesetGround, x: 4, y: 7 , w: 1, h: 1},  // Eau
+
 
 //-------
 
@@ -247,6 +250,38 @@ const tileImages = {
 // --------------------------------------- OTHER ---------------------------------------
 
     500: { tileset: tilesetFountain, x: 0, y: 0 }, // Fontaine
+
+    501: { tileset: tilesetGround, x: 8, y: 1 , w: 1, h: 1},  // Sol BIG    NOP VERSION
+    502: { tileset: tilesetGround, x: 9, y: 1 , w: 1, h: 1},  // Sol BIG    NOP VERSION
+    503: { tileset: tilesetGround, x: 8, y: 2 , w: 1, h: 1},  // Sol BIG    NOP VERSION
+    504: { tileset: tilesetGround, x: 9, y: 2 , w: 1, h: 1},  // Sol BIG    NOP VERSION
+    505: { tileset: tilesetGround, x: 10, y: 1 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+    506: { tileset: tilesetGround, x: 11, y: 1 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+    507: { tileset: tilesetGround, x: 10, y: 2 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+    508: { tileset: tilesetGround, x: 11, y: 2 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+    509: { tileset: tilesetGround, x: 10, y: 3 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+    510: { tileset: tilesetGround, x: 11, y: 3 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+    511: { tileset: tilesetGround, x: 10, y: 4 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+    512: { tileset: tilesetGround, x: 11, y: 4 , w: 1, h: 1},  // Sol herbe    NOP VERSION
+
+    513: { tileset: tilesetTree, x: 8, y: 1 , w: 1, h: 1},  // Champignon Brun NE  NOP VERSION
+    514: { tileset: tilesetTree, x: 8, y: 2 , w: 1, h: 1},  // Champignon Brun SE  NOP VERSION
+    515: { tileset: tilesetTree, x: 7, y: 2 , w: 1, h: 1},  // Champignon Brun SO  NOP VERSION
+    516: { tileset: tilesetTree, x: 7, y: 1 , w: 1, h: 1},  // Champignon Brun NO  NOP VERSION
+    517: { tileset: tilesetTree, x: 10, y: 1 , w: 1, h: 1}, // Champignon Rouge NE  NOP VERSION
+    518: { tileset: tilesetTree, x: 10, y: 2 , w: 1, h: 1}, // Champignon Rouge SE  NOP VERSION
+    519: { tileset: tilesetTree, x: 9, y: 2 , w: 1, h: 1}, // Champignon Rouge SO  NOP VERSION
+    520: { tileset: tilesetTree, x: 9, y: 1 , w: 1, h: 1}, // Champignon Rouge NO  NOP VERSION
+    
+    521: { tileset: tilesetTree, x: 10, y: 3 , w: 1, h: 1},  // Fleur Rose NE  NOP VERSION
+    522: { tileset: tilesetTree, x: 10, y: 4 , w: 1, h: 1},  // Fleur Rose SE  NOP VERSION
+    523: { tileset: tilesetTree, x: 9, y: 4 , w: 1, h: 1},  // Fleur Rose SO  NOP VERSION
+    524: { tileset: tilesetTree, x: 9, y: 3 , w: 1, h: 1},  // Fleur Rose NO  NOP VERSION
+    
+    525: { tileset: tilesetTree, x: 10, y: 5 , w: 1, h: 1},  // Fleur Bleu clair NE  NOP VERSION
+    526: { tileset: tilesetTree, x: 10, y: 6 , w: 1, h: 1},  // Fleur Bleu clair SE  NOP VERSION
+    527: { tileset: tilesetTree, x: 9, y: 6 , w: 1, h: 1},  // Fleur Bleu clair SO  NOP VERSION
+    528: { tileset: tilesetTree, x: 9, y: 5 , w: 1, h: 1},  // Fleur Bleu clair NO  NOP VERSION
 };
 
 

@@ -1,6 +1,6 @@
-
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -97,6 +97,21 @@ h1 {
     border-radius: 5px;
 }
 
+.volume-control {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.volume-control input {
+    width: 100px;
+    margin-left: 10px;
+}
+
 .score-container {
     font-size: 2em;
     font-weight: bold;
@@ -105,18 +120,9 @@ h1 {
     display: none;
 }
 
-.volume-control {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.volume-control input {
-    width: 50%;
-}
-
 #retryButton {
     display: none;
-    margin-top: 20px; /* Increase margin-top for more separation */
+    margin-top: 40px; /* Increase margin-top for more separation */
     padding: 10px 20px;
     font-size: 1.5em;
     background-color: #ff5722;
