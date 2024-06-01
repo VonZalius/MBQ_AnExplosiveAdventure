@@ -33,7 +33,14 @@ h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-#startButton, #retryButton {
+#buttonContainer {
+    display: flex;
+    gap: 20px; /* Espacement entre les boutons */
+    justify-content: center;
+    margin-bottom: 20px; /* Ajustez l'espacement sous le conteneur si nécessaire */
+}
+
+#ruinsButton, #sanctuaryButton, #retryButton {
     padding: 15px 30px;
     font-size: 1.5em;
     color: #ffffff;

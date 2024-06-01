@@ -6,7 +6,9 @@ const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 
 const backgroundMusic = document.getElementById('backgroundMusic');
-const gameMusic = document.getElementById('gameMusic');
+let isBackgroundMusicPlaying = false;
+const gameMusic1 = document.getElementById('gameMusic1');
+const gameMusic2 = document.getElementById('gameMusic2');
 const deathMusic = document.getElementById('deathMusic');
 
 const deathSound = document.getElementById('deathSound');
@@ -15,6 +17,12 @@ const magicSound = document.getElementById('magicSound');
 const blopSound = document.getElementById('blopSound');
 const impactSound = document.getElementById('impactSound');
 const footStepSound = document.getElementById('footStepSound');
+
+let BUTTONTYPE; // Déclaration de la variable
+
+const ruinsButton = document.getElementById('ruinsButton');
+const sanctuaryButton = document.getElementById('sanctuaryButton');
+
 
 // Désactiver le lissage d'image pour préserver la netteté des sprites en pixel art
 context.imageSmoothingEnabled = false;
@@ -30,7 +38,6 @@ document.addEventListener('keyup', function(event) {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const startButton = document.getElementById('startButton');
     const retryButton = document.getElementById('retryButton');
     const mainMenu = document.getElementById('mainMenu');
     const gameSection = document.getElementById('gameSection');
@@ -56,19 +63,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    startButton.addEventListener('click', () => {
+
+    document.addEventListener('keydown', function(event) {
+        if (!isBackgroundMusicPlaying) {
+            backgroundMusic.play();
+            isBackgroundMusicPlaying = true;
+        }
+        // Autres logiques de gestion des touches ici...
+    });
+
+    ruinsButton.addEventListener('click', () => {
+        BUTTONTYPE = 1;
+        mainMenu.style.display = 'none';
+        gameSection.style.display = 'flex';
+        gameCanvas.style.display = 'block';
+        score.style.display = 'block';
+        startGame();
+    });
+
+    sanctuaryButton.addEventListener('click', () => {
+        BUTTONTYPE = 2;
+        mainMenu.style.display = 'none';
+        gameSection.style.display = 'flex';
+        gameCanvas.style.display = 'block';
+        score.style.display = 'block';
+        startGame();
+    });
+
+    /*startButton.addEventListener('click', () => {
         mainMenu.style.display = 'none';
         gameSection.style.display = 'flex';
         gameCanvas.style.display = 'block';
         score.style.display = 'block';
         // Start game logic here
-    });
+    });*/
 
     retryButton.addEventListener('click', () => {
         mainMenu.style.display = 'flex';
         gameSection.style.display = 'none';
         gameCanvas.style.display = 'none';
         score.style.display = 'none';
+        ruinsButton.style.display = 'inline'; // Afficher le bouton Ruines
+        sanctuaryButton.style.display = 'inline'; // Afficher le bouton Sanctuaire
+
         // Reset game logic here
     });
 });
@@ -83,7 +120,8 @@ const volumeControl = document.getElementById('volume');
 // Liste des éléments audio
 const audioElements = [
     document.getElementById('backgroundMusic'),
-    document.getElementById('gameMusic'),
+    document.getElementById('gameMusic1'),
+    document.getElementById('gameMusic2'),
     document.getElementById('deathMusic'),
     document.getElementById('deathSound'),
     document.getElementById('coinSound'),
@@ -115,6 +153,7 @@ updateVolume();
 // ------------------------------------------------------------- INIT -------------------------------------------------------------
 
 let showCollision = false;
+let GameMusic;
 
 // Variables du personnage
 let characterSize = 0;
@@ -201,9 +240,9 @@ const map1 = [
  [151, 909, 301, 907, 906, 900, 202, 306, 900, 908, 900, 906, 908, 900, 208, 212, 217, 911, 905, 203],
  [151, 901, 905, 900, 911, 307, 900, 912, 909, 920, 900, 905, 900, 907, 900, 912, 203, 900, 901, 202],
  [151, 306, 900, 910, 900, 909, 908, 900, 900, 906, 907, 900, 917, 305, 903, 216, 218, 908, 900, 307],
- [151, 928, 900, 907, 900, 900, 208, 217, 905, 900, 306, 908, 900, 902, 900, 203, 902, 900, 300, 100],
+ [151, 928, 900, 907, 900, 900, 208, 217, 905, 900, 306, 908, 900, 902, 900, 203, 902, 900, 300, 508],
  [148, 142, 910, 900, 910, 908, 311, 203, 900, 912, 900, 900, 901, 900, 300, 203, 900, 901, 918, 149],
- [300, 151, 906, 307, 927, 900, 906, 215, 224, 909, 208, 212, 209, 213, 214, 218, 300, 910, 904, 151],
+ [300, 151, 906, 307, 927, 900, 906, 215, 224, 909, 225, 212, 209, 213, 214, 218, 300, 910, 904, 151],
  [305, 151, 900, 909, 137, 134, 900, 911, 907, 900, 901, 304, 300, 920, 900, 901, 900, 903, 900, 151],
  [149, 143, 902, 137, 131, 132, 140, 134, 902, 900, 904, 900, 902, 907, 300, 900, 901, 900, 300, 151],
  [143, 926, 900, 136, 130, 101, 101, 132, 140, 134, 900, 901, 903, 900, 902, 904, 900, 300, 919, 151],
@@ -215,16 +254,26 @@ const map1 = [
 
 // MAPS
 const map2 = [
-    [101, 133, 138, 138, 138, 138, 138, 138, 130, 101],
-    [133, 135, 900, 900, 900, 900, 900, 900, 136, 130],
-    [141, 900, 900, 900, 301, 900, 300, 900, 900, 139],
-    [141, 900, 302, 900, 900, 900, 900, 900, 900, 139],
-    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139],
-    [141, 900, 900, 900, 900, 900, 900, 303, 900, 139],
-    [141, 900, 305, 900, 900, 900, 900, 900, 900, 139],
-    [141, 900, 900, 900, 900, 900, 900, 900, 900, 139],
-    [132, 134, 900, 900, 900, 900, 304, 900, 137, 131],
-    [101, 132, 140, 140, 140, 140, 140, 140, 131, 101]
+ [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
+ [101, 101, 101, 101, 101, 133, 138, 138, 138, 138, 138, 138, 138, 138, 130, 101, 101, 101, 101, 101],
+ [101, 101, 133, 138, 138, 135, 302, 924, 904, 903, 900, 921, 900, 903, 136, 138, 130, 101, 101, 101],
+ [101, 101, 141, 921, 905, 901, 902, 900, 900, 921, 302, 901, 924, 900, 302, 922, 136, 130, 101, 101],
+ [101, 101, 132, 134, 302, 922, 905, 903, 302, 900, 904, 908, 904, 302, 900, 901, 922, 139, 101, 101],
+ [101, 101, 101, 132, 140, 140, 134, 302, 902, 901, 922, 900, 900, 902, 905, 900, 904, 139, 101, 101],
+ [101, 101, 133, 138, 138, 138, 135, 901, 900, 908, 902, 302, 900, 924, 903, 302, 900, 136, 130, 101],
+ [101, 101, 141, 900, 905, 912, 904, 923, 302, 903, 900, 901, 902, 900, 900, 924, 302, 912, 139, 101],
+ [101, 133, 135, 302, 923, 901, 910, 900, 924, 900, 901, 910, 900, 302, 904, 909, 901, 900, 139, 101],
+ [101, 141, 921, 905, 909, 900, 216, 209, 209, 224, 900, 902, 225, 209, 209, 217, 921, 302, 139, 101],
+ [101, 141, 907, 906, 900, 307, 203, 905, 900, 909, 910, 900, 907, 901, 304, 203, 902, 137, 131, 101],
+ [101, 141, 306, 900, 908, 313, 202, 900, 907, 500, 100, 100, 100, 906, 900, 202, 900, 139, 101, 101],
+ [101, 141, 908, 307, 900, 910, 306, 911, 906, 100, 100, 100, 100, 900, 910, 305, 904, 136, 130, 101],
+ [101, 141, 907, 900, 912, 911, 900, 910, 900, 100, 100, 100, 100, 900, 911, 900, 908, 906, 139, 101],
+ [101, 132, 134, 906, 900, 307, 909, 900, 302, 100, 100, 100, 100, 302, 923, 902, 912, 304, 139, 101],
+ [101, 101, 141, 307, 905, 908, 900, 906, 905, 924, 311, 305, 901, 908, 900, 905, 305, 137, 131, 101],
+ [101, 101, 132, 140, 134, 900, 907, 306, 900, 912, 900, 910, 900, 900, 909, 911, 903, 139, 101, 101],
+ [101, 101, 101, 101, 132, 140, 134, 900, 908, 305, 911, 908, 905, 304, 137, 140, 140, 131, 101, 101],
+ [101, 101, 101, 101, 101, 101, 132, 140, 140, 140, 140, 140, 140, 140, 131, 101, 101, 101, 101, 101],
+ [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101]
 ];
 
 //const m = gRI(1, 1);
@@ -410,10 +459,10 @@ class Enemy {
 // Variables pour les ennemis
 const enemies = [];
 const initialEnemies = [
-    new Enemy(100, 100, gRI(50, 100), gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
-    new Enemy(700, 100, gRI(50, 100), -gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
-    new Enemy(100, 700, gRI(50, 100), gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
-    new Enemy(700, 700, gRI(50, 100), -gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(1, 1, gRI(50, 100), gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(800, 1, gRI(50, 100), -gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(1, 800, gRI(50, 100), gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(800, 800, gRI(50, 100), -gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
 ];
 
 
@@ -451,7 +500,7 @@ function checkCollisions() {
             frameRate = 2;
             isDead = true;
             playSound(deathSound); // Jouer le son de mort
-            gameMusic.pause();
+            GameMusic.pause();
             deathMusic.play();
             if (currentDirection == 'right' || currentDirection == 'walkRight')
                 currentDirection = 'deadRight';
@@ -691,7 +740,7 @@ function drawMap(map) {
                 context.drawImage(
                     sprite.tileset,
                     sprite.x * tileSize, sprite.y * tileSize, (sprite.w * tileSize), (sprite.h * tileSize), // Source rectangle
-                    tileWidth * (col - (sprite.w-1)/2), tileHeight * (row - sprite.h + 1), sprite.w * tileWidth, (sprite.h * tileHeight) // Destination rectangle
+                    tileWidth * (col - (sprite.w-1)/2 + sprite.bonus), tileHeight * (row - sprite.h + 1 + sprite.bonus2), sprite.w * tileWidth, (sprite.h * tileHeight) // Destination rectangle
                 );
 
                 // Dessiner la boîte de collision des murs
@@ -790,20 +839,30 @@ requestAnimationFrame(gameLoop);
 function startGame() {
     const scoreElement = document.getElementById('score');
     scoreElement.style.display = 'block';
-    startButton.style.display = 'none';
+    ruinsButton.style.display = 'none'; // Masquer le bouton Ruines
+    sanctuaryButton.style.display = 'none'; // Masquer le bouton Sanctuaire
     canvas.style.display = 'block';
     updateScore();
     requestAnimationFrame(gameLoop);
 
     backgroundMusic.pause();
     backgroundMusic.src = '';
-    gameMusic.play();
 
-    const m = gRI(1, 2);
+    
+    
+    const m = BUTTONTYPE;
     if (m ==1)
+    {
+        GameMusic = gameMusic1;
         map = map1;
+    }
     if (m ==2)
+    {
+        GameMusic = gameMusic2;
         map = map2;
+    }
+
+    GameMusic.play();
 
     characterSize = baseCharacterSize * (baseMapSize / map.length);
     collisionBoxSize = characterSize / collisionBoxSize; // Taille de la boîte de collision du personnage
@@ -829,9 +888,6 @@ function startGame() {
         playSound(impactSound);
     }, 3000);
 }
-
-// Ajouter un écouteur d'événements pour le bouton de démarrage
-startButton.addEventListener('click', startGame);
 
 // Assurez-vous que les images sont chargées avant de démarrer la boucle de jeu
 characterTileset.onload = function() {
