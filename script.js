@@ -439,27 +439,33 @@ class Enemy {
         this.currentFrameIndex = 0;
         this.frameTime = 0;
         this.hitboxScale = hitboxScale; // Scale for the hitbox size
+        this.isInsideMap = false;
     }
 
     update(deltaTime) {
         this.x += this.speedX * deltaTime;
         this.y += this.speedY * deltaTime;
 
-        // Rebondir sur les bords du canvas et ajuster la position pour éviter les glitchs
-        if (this.x <= 0) {
-            this.x = 0;
-            this.speedX = -this.speedX;
-        } else if (this.x + this.size >= canvas.width) {
-            this.x = canvas.width - this.size;
-            this.speedX = -this.speedX;
+        const hitboxSize = this.size * this.hitboxScale;
+        const hitboxX = this.x + (this.size - hitboxSize) / 2;
+        const hitboxY = this.y + (this.size - hitboxSize) / 2;
+
+        // Vérifier si l'ennemi est complètement à l'intérieur de la carte
+        if (
+            hitboxX >= 0 && hitboxX + hitboxSize <= canvas.width &&
+            hitboxY >= 0 && hitboxY + hitboxSize <= canvas.height
+        ) {
+            this.isInsideMap = true;
         }
 
-        if (this.y <= 0) {
-            this.y = 0;
-            this.speedY = -this.speedY;
-        } else if (this.y + this.size >= canvas.height) {
-            this.y = canvas.height - this.size;
-            this.speedY = -this.speedY;
+        if (this.isInsideMap) {
+            // Appliquer la logique de rebond seulement quand l'ennemi est complètement à l'intérieur de la carte
+            if (hitboxX <= 0 || hitboxX + hitboxSize >= canvas.width) {
+                this.speedX = -this.speedX;
+            }
+            if (hitboxY <= 0 || hitboxY + hitboxSize >= canvas.height) {
+                this.speedY = -this.speedY;
+            }
         }
 
         // Mettre à jour l'animation
@@ -506,14 +512,81 @@ class Enemy {
 
 
 
+
 // Variables pour les ennemis
 const enemies = [];
-const initialEnemies = [
+/*const initialEnemies = [
     new Enemy(1, 1, gRI(50, 100), gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
     new Enemy(800, 1, gRI(50, 100), -gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
     new Enemy(1, 800, gRI(50, 100), gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
     new Enemy(800, 800, gRI(50, 100), -gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
-];
+];*/
+
+function spawnEnemy() {
+    if (!isDead) {
+        // Distance en dehors de la carte pour le spawn
+        const spawnDistance = 50;
+        const spawnPositions = [
+            { x: canvas.width / 2, y: -spawnDistance }, // Haut de la carte
+            { x: canvas.width / 2, y: canvas.height + spawnDistance }, // Bas de la carte
+            { x: -spawnDistance, y: canvas.height / 2 }, // Gauche de la carte
+            { x: canvas.width + spawnDistance, y: canvas.height / 2 } // Droite de la carte
+        ];
+
+        // Sélectionner une position de spawn aléatoire
+        const spawnPosition = spawnPositions[Math.floor(Math.random() * spawnPositions.length)];
+
+        // Calculer la direction légèrement aléatoire vers l'intérieur de la carte
+        let directionX = 0;
+        let directionY = 0;
+        
+        if (spawnPosition.y < 0) {
+            directionY = gRI(20, 300); // Aller vers le bas
+            directionX = gRI(-160, 160); // Légèrement à gauche ou à droite
+            warningPosition = 1;
+        } else if (spawnPosition.y > canvas.height) {
+            directionY = -gRI(20, 300); // Aller vers le haut
+            directionX = gRI(-160, 160); // Légèrement à gauche ou à droite
+            warningPosition = 3;
+        } else if (spawnPosition.x < 0) {
+            directionX = gRI(20, 300); // Aller vers la droite
+            directionY = gRI(-160, 160); // Légèrement en haut ou en bas
+            warningPosition = 4;
+        } else if (spawnPosition.x > canvas.width) {
+            directionX = -gRI(20, 300); // Aller vers la gauche
+            directionY = gRI(-160, 160); // Légèrement en haut ou en bas
+            warningPosition = 2;
+        }
+
+        // Afficher l'avertissement au bord de la carte
+        warning = true;
+
+        setTimeout(() => {
+            const newEnemy = new Enemy(
+                spawnPosition.x,
+                spawnPosition.y,
+                gRI(50, 100),
+                directionX,
+                directionY,
+                enemyImage,
+                enemyFrames,
+                enemyTileSize,
+                enemyFrameRate,
+                0.7
+            );
+
+            enemies.push(newEnemy);
+
+            // Retirer l'avertissement après l'apparition de l'ennemi
+            warning = false;
+        }, 3000); // 3000 ms = 3 secondes
+    }
+}
+
+
+
+
+
 
 
 // Fonction pour ajouter un ennemi
@@ -559,6 +632,11 @@ function checkCollisions() {
         }
     }
 }
+// ------------------------------------------------------------- WARNING -------------------------------------------------------------
+
+let warning = false; // Avertissement initialisé à null
+let warningPosition;
+
 
 // ------------------------------------------------------------- UPDATE -------------------------------------------------------------
 
@@ -821,11 +899,53 @@ function drawEnemies() {
     }
 }
 
-// Effacer le canevas et redessiner le personnage
 function draw() {
     drawMap(map);
     drawEnemies();
+
+    // Dessiner l'avertissement si présent
+    if (warning) { // Afficher l'avertissement pendant 3 secondes
+        drawWarning();
+    }
 }
+
+// Fonction pour dessiner l'avertissement
+const warningImage = new Image();
+warningImage.src = 'src/warning.png'; // Chemin vers l'image de l'avertissement
+const width = 80; // Largeur 2x plus grande
+const height = 80; // Hauteur 2x plus grande
+function drawWarning() {
+
+    // Attendez que l'image soit chargée avant de la dessiner
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        let x = 0;
+        let y = 0;
+
+        if (warningPosition == 1) {
+            // Bord nord (haut)
+            x = (canvasWidth - width) / 2;
+            y = 0;
+        } else if (warningPosition == 2) {
+            // Bord est (droite)
+            x = canvasWidth - width;
+            y = (canvasHeight - height) / 2;
+        } else if (warningPosition == 3) {
+            // Bord sud (bas)
+            x = (canvasWidth - width) / 2;
+            y = canvasHeight - height;
+        } else if (warningPosition == 4) {
+            // Bord ouest (gauche)
+            x = 0;
+            y = (canvasHeight - height) / 2;
+        }
+
+        context.drawImage(warningImage, x, y, width, height);
+}
+
+
+
 
 // ------------------------------------------------------------- OTHER -------------------------------------------------------------
 
@@ -876,11 +996,9 @@ function gameLoop(timestamp)
 updateCharacterAnimation(deltaTime);
 updateEnemies(deltaTime);
 draw();
-if (elapsedTime < 3) {
-    drawMessage("Preparez-vous...");
-} else {
-    checkCollisions();
-}
+
+checkCollisions();
+
 requestAnimationFrame(gameLoop);
 }
 
@@ -936,12 +1054,15 @@ function startGame()
     characterY = randomPosition.row * tileHeight - (tileHeight);
 
     playSound(blopSound);
-    // Ajouter les ennemis après 3 secondes
+
+
     setTimeout(() => {
-        enemies.push(...initialEnemies);
+        spawnEnemy();
         placeRandomCoin();
-        playSound(impactSound);
-    }, 3000);
+    
+        // Then spawn enemies every 10 seconds
+        setInterval(spawnEnemy, 10000); // 10000 ms = 10 seconds
+    }, 5000); // 5000 ms = 5 seconds
 }
 
 // Assurez-vous que les images sont chargées avant de démarrer la boucle de jeu
