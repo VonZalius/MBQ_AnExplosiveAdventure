@@ -40,7 +40,7 @@ h1 {
     margin-bottom: 20px; /* Ajustez l'espacement sous le conteneur si nécessaire */
 }
 
-#ruinsButton, #sanctuaryButton, #retryButton {
+#ruinsButton, #sanctuaryButton, #canalButton, #retryButton {
     padding: 15px 30px;
     font-size: 1.5em;
     color: #ffffff;

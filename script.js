@@ -9,6 +9,7 @@ const backgroundMusic = document.getElementById('backgroundMusic');
 let isBackgroundMusicPlaying = false;
 const gameMusic1 = document.getElementById('gameMusic1');
 const gameMusic2 = document.getElementById('gameMusic2');
+const gameMusic3 = document.getElementById('gameMusic3');
 const deathMusic = document.getElementById('deathMusic');
 
 const deathSound = document.getElementById('deathSound');
@@ -22,6 +23,7 @@ let BUTTONTYPE; // Déclaration de la variable
 
 const ruinsButton = document.getElementById('ruinsButton');
 const sanctuaryButton = document.getElementById('sanctuaryButton');
+const canalButton = document.getElementById('canalButton');
 
 
 // Désactiver le lissage d'image pour préserver la netteté des sprites en pixel art
@@ -90,6 +92,15 @@ document.addEventListener('DOMContentLoaded', () => {
         startGame();
     });
 
+    canalButton.addEventListener('click', () => {
+        BUTTONTYPE = 3;
+        mainMenu.style.display = 'none';
+        gameSection.style.display = 'flex';
+        gameCanvas.style.display = 'block';
+        score.style.display = 'block';
+        startGame();
+    });
+
     /*startButton.addEventListener('click', () => {
         mainMenu.style.display = 'none';
         gameSection.style.display = 'flex';
@@ -122,6 +133,7 @@ const audioElements = [
     document.getElementById('backgroundMusic'),
     document.getElementById('gameMusic1'),
     document.getElementById('gameMusic2'),
+    document.getElementById('gameMusic3'),
     document.getElementById('deathMusic'),
     document.getElementById('deathSound'),
     document.getElementById('coinSound'),
@@ -159,8 +171,8 @@ let GameMusic;
 let characterSize = 0;
 const baseCharacterSize = 150; // Taille du personnage pour une carte de 10 cases
 const baseMapSize = 10; // Taille de la carte de base (10 cases)
-let collisionBoxSize = 6; // Taille de la boîte de collision du personnage
-let collisionOffsetY = 3.5;
+let collisionBoxSize = 10; // Taille de la boîte de collision du personnage
+let collisionOffsetY = 3.2;
 let characterX = canvas.width / 2 - characterSize / 2;
 let characterY = canvas.height / 2 - characterSize / 2;
 let characterWalkSpeed = 4; // Pixels par seconde
@@ -229,7 +241,7 @@ let frameTime = 0;
 // MAPS
 let map;
 
-const map1 = [
+const Ruines = [
  [100, 502, 501, 100, 304, 503, 100, 149, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 146, 507],
  [301, 149, 152, 152, 152, 152, 152, 143, 305, 911, 906, 906, 901, 913, 301, 314, 312, 902, 144, 146],
  [149, 143, 305, 301, 312, 901, 313, 915, 907, 900, 913, 301, 902, 900, 904, 903, 900, 901, 301, 153],
@@ -252,8 +264,7 @@ const map1 = [
  [202, 503, 300, 305, 149, 152, 152, 152, 152, 152, 152, 152, 152, 152, 143, 300, 149, 152, 152, 143]
 ];
 
-// MAPS
-const map2 = [
+const Sanctuaire = [
  [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101],
  [101, 101, 101, 101, 101, 133, 138, 138, 138, 138, 138, 138, 138, 138, 130, 101, 101, 101, 101, 101],
  [101, 101, 133, 138, 138, 135, 302, 924, 904, 903, 900, 921, 900, 903, 136, 138, 130, 101, 101, 101],
@@ -276,6 +287,28 @@ const map2 = [
  [101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101]
 ];
 
+const Canal = [
+ [502, 515, 149, 152, 143, 504, 149, 143, 306, 100, 139, 101, 101, 141, 515, 229, 227, 227, 227, 230],
+ [100, 149, 143, 901, 307, 303, 151, 915, 901, 303, 139, 101, 101, 141, 505, 226, 304, 905, 906, 226],
+ [303, 151, 902, 914, 902, 900, 151, 903, 904, 137, 131, 101, 101, 141, 305, 226, 900, 909, 907, 226],
+ [503, 151, 303, 900, 903, 149, 143, 902, 909, 139, 101, 101, 133, 135, 910, 226, 910, 900, 908, 226],
+ [149, 143, 911, 904, 900, 151, 303, 900, 915, 139, 101, 101, 141, 303, 902, 228, 233, 900, 235, 231],
+ [151, 303, 901, 900, 902, 151, 908, 901, 400, 403, 406, 406, 409, 412, 901, 928, 911, 900, 907, 311],
+ [151, 916, 904, 903, 149, 143, 902, 900, 929, 930, 931, 931, 932, 933, 908, 910, 900, 912, 908, 145],
+ [151, 901, 900, 900, 303, 914, 904, 907, 402, 405, 408, 408, 411, 414, 907, 900, 905, 926, 928, 153],
+ [151, 900, 903, 900, 901, 903, 900, 901, 303, 415, 101, 101, 416, 910, 304, 906, 907, 900, 305, 153],
+ [143, 303, 902, 904, 910, 902, 900, 902, 307, 139, 101, 101, 141, 900, 909, 900, 911, 304, 905, 153],
+ [100, 307, 912, 901, 900, 914, 303, 908, 909, 139, 101, 101, 141, 300, 900, 911, 900, 907, 906, 153],
+ [303, 900, 911, 900, 904, 900, 901, 900, 137, 131, 101, 101, 141, 928, 236, 900, 100, 900, 300, 153],
+ [216, 224, 901, 208, 217, 900, 900, 303, 139, 101, 101, 133, 135, 909, 900, 910, 925, 908, 145, 147],
+ [203, 902, 900, 914, 202, 303, 905, 400, 403, 406, 406, 409, 412, 305, 907, 900, 909, 900, 153, 507],
+ [203, 903, 904, 910, 900, 904, 908, 929, 930, 931, 931, 932, 933, 908, 900, 905, 906, 307, 153, 100],
+ [203, 303, 900, 902, 908, 906, 900, 402, 405, 408, 408, 411, 414, 900, 910, 900, 315, 145, 147, 300],
+ [215, 217, 913, 901, 907, 900, 909, 915, 415, 101, 101, 416, 307, 925, 911, 906, 900, 153, 304, 526],
+ [504, 203, 905, 900, 900, 901, 306, 900, 139, 101, 101, 132, 134, 905, 304, 908, 927, 144, 146, 506],
+ [303, 215, 207, 901, 900, 902, 903, 303, 136, 130, 101, 101, 132, 140, 134, 912, 910, 900, 153, 305],
+ [501, 502, 516, 307, 225, 209, 207, 501, 525, 136, 130, 101, 101, 101, 132, 140, 134, 300, 144, 146]
+];
 //const m = gRI(1, 1);
 
 // ------------------------------------------------------------- COINS -------------------------------------------------------------
@@ -393,7 +426,7 @@ const enemyFrameRate = 10; // Nombre de frames par seconde pour les ennemis
 
 // Classe pour les ennemis
 class Enemy {
-    constructor(x, y, size, speedX, speedY, image, frames, tileSize, frameRate) {
+    constructor(x, y, size, speedX, speedY, image, frames, tileSize, frameRate, hitboxScale = 0.7) {
         this.x = x;
         this.y = y;
         this.size = size;
@@ -405,6 +438,7 @@ class Enemy {
         this.frameRate = frameRate;
         this.currentFrameIndex = 0;
         this.frameTime = 0;
+        this.hitboxScale = hitboxScale; // Scale for the hitbox size
     }
 
     update(deltaTime) {
@@ -443,26 +477,42 @@ class Enemy {
             frame.x * this.tileSize, frame.y * this.tileSize, this.tileSize, this.tileSize,
             this.x, this.y, this.size, this.size
         );
+        if (showCollision) {
+            this.drawCollisionBox(context);
+        }
+    }
+
+    drawCollisionBox(context) {
+        const hitboxSize = this.size * this.hitboxScale;
+        const hitboxX = this.x + (this.size - hitboxSize) / 2;
+        const hitboxY = this.y + (this.size - hitboxSize) / 2;
+        context.strokeStyle = 'red';
+        context.lineWidth = 2;
+        context.strokeRect(hitboxX, hitboxY, hitboxSize, hitboxSize);
     }
 
     checkCollision(characterX, characterY, characterSize) {
+        const hitboxSize = this.size * this.hitboxScale;
+        const hitboxX = this.x + (this.size - hitboxSize) / 2;
+        const hitboxY = this.y + (this.size - hitboxSize) / 2;
         return (
-            this.x < characterX + characterSize &&
-            this.x + this.size > characterX &&
-            this.y < characterY + characterSize &&
-            this.y + this.size > characterY
+            hitboxX < characterX + characterSize &&
+            hitboxX + hitboxSize > characterX &&
+            hitboxY < characterY + characterSize &&
+            hitboxY + hitboxSize > characterY
         );
     }
 }
 
 
+
 // Variables pour les ennemis
 const enemies = [];
 const initialEnemies = [
-    new Enemy(1, 1, gRI(50, 100), gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
-    new Enemy(800, 1, gRI(50, 100), -gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
-    new Enemy(1, 800, gRI(50, 100), gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
-    new Enemy(800, 800, gRI(50, 100), -gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate),
+    new Enemy(1, 1, gRI(50, 100), gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
+    new Enemy(800, 1, gRI(50, 100), -gRI(50, 300), gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
+    new Enemy(1, 800, gRI(50, 100), gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
+    new Enemy(800, 800, gRI(50, 100), -gRI(50, 300), -gRI(50, 300), enemyImage, enemyFrames, enemyTileSize, enemyFrameRate, 0.7),
 ];
 
 
@@ -522,7 +572,7 @@ function isPositionValid(collisionX, collisionY) {
         return false;
     }
     const tile = map[row][col];
-    return tile >= 900 /* tile == XXX */;
+    return (tile >= 900);
 }
 
 // Vérifier si une boîte de collision est entièrement dans une position valide
@@ -768,8 +818,6 @@ function drawMap(map) {
 function drawEnemies() {
     for (const enemy of enemies) {
         enemy.draw(context);
-        if (showCollision)
-            drawCollisionBox(enemy.x, enemy.y, enemy.size, enemy.size);
     }
 }
 
@@ -789,7 +837,7 @@ function getAllPositions(map, tileValue) {
     const positions = [];
     for (let row = 0; row < map.length; row++) {
         for (let col = 0; col < map[row].length; col++) {
-            if (map[row][col] >= tileValue) {
+            if (map[row][col] >= tileValue ) {
                 positions.push({ row: row, col: col });
             }
         }
@@ -814,7 +862,8 @@ function playSound(sound) {
 // Boucle de jeu
 let lastTime = 0;
 let startTime = null;
-function gameLoop(timestamp) {
+function gameLoop(timestamp)
+{
     if (!startTime) startTime = timestamp;
     let deltaTime = (timestamp - lastTime) / 1000;
     let elapsedTime = (timestamp - startTime) / 1000;
@@ -836,7 +885,8 @@ requestAnimationFrame(gameLoop);
 }
 
 // Démarrer le jeu
-function startGame() {
+function startGame()
+{
     const scoreElement = document.getElementById('score');
     scoreElement.style.display = 'block';
     ruinsButton.style.display = 'none'; // Masquer le bouton Ruines
@@ -854,12 +904,17 @@ function startGame() {
     if (m ==1)
     {
         GameMusic = gameMusic1;
-        map = map1;
+        map = Ruines;
     }
     if (m ==2)
     {
         GameMusic = gameMusic2;
-        map = map2;
+        map = Sanctuaire;
+    }
+    if (m ==3)
+    {
+        GameMusic = gameMusic3;
+        map = Canal;
     }
 
     GameMusic.play();

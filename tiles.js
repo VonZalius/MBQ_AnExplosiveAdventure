@@ -140,6 +140,11 @@ const tileImages = {
     152: { tileset: tilesetGround, x: 2, y: 4 , w: 1, h: 1, bonus: 0, bonus2: 0}, // Bord de falaise S
     153: { tileset: tilesetGround, x: 1, y: 2 , w: 1, h: 1, bonus: 0, bonus2: 0}, // Bord de falaise O
 
+    154: { tileset: tilesetGround, x: 3, y: 1 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Bord de falaise NE Transition
+    155: { tileset: tilesetGround, x: 3, y: 4 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Bord de falaise SE Transition
+    156: { tileset: tilesetGround, x: 4, y: 4 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Bord de falaise SO Transition
+    157: { tileset: tilesetGround, x: 4, y: 1 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Bord de falaise NO Transition
+
 // --------------------------------------- WALL ---------------------------------------
 
     200: { tileset: tilesetWall, x: 1, y: 5 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Mur seul
@@ -217,29 +222,30 @@ const tileImages = {
     312: { tileset: tilesetTree, x: 2, y: 7 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Tombe 0
     313: { tileset: tilesetTree, x: 3, y: 7 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Tombe 2
     314: { tileset: tilesetTree, x: 4, y: 7 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Tombe 3
-    315: { tileset: tilesetTree, x: 6, y: 8 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Feu de camp éteint
+    315: { tileset: tilesetTree, x: 7, y: 7 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Feu de camp éteint
     
     316: { tileset: tilesetWall, x: 3, y: 7 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Po0
 
 // --------------------------------------- BRIDGE 1 ---------------------------------------
 
-    400: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 1-1
-    401: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 1-2
-    402: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0}, // Pont ligne 1-3
-    403: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0}, // Pont ligne 2-1
-    404: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0}, // Pont ligne 2-2
-    405: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0}, // Pont ligne 2-3
-    406: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 3-1
-    407: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 3-2
-    408: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 3-3
-    409: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 4-1
-    410: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 4-2
-    411: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 4-3
-    412: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 5-1
-    413: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 5-2
-    414: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont ligne 5-3
-    415: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0},  // Pont support O
-    416: { tileset: tilesetBridge1, x: 0, y: 0 , bonus: 0, bonus2: 0}, // Pont support E
+    400: { tileset: tilesetBridge1, x: 1, y: 0 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Pont ligne 1-1
+    929: { tileset: tilesetBridge1, x: 1, y: 2 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Pont ligne 1-2
+    402: { tileset: tilesetBridge1, x: 1, y: 3 , w: 1, h: 2, bonus: 0, bonus2: 0}, // Pont ligne 1-3
+    403: { tileset: tilesetBridge1, x: 2, y: 0 , w: 1, h: 2, bonus: 0, bonus2: 0}, // Pont ligne 2-1
+    930: { tileset: tilesetBridge1, x: 2, y: 2 , w: 1, h: 1, bonus: 0, bonus2: 0}, // Pont ligne 2-2
+    405: { tileset: tilesetBridge1, x: 2, y: 3 , w: 1, h: 2, bonus: 0, bonus2: 0}, // Pont ligne 2-3
+    406: { tileset: tilesetBridge1, x: 3, y: 0 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Pont ligne 3-1
+    931: { tileset: tilesetBridge1, x: 3, y: 2 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Pont ligne 3-2
+    408: { tileset: tilesetBridge1, x: 3, y: 3 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Pont ligne 3-3
+    409: { tileset: tilesetBridge1, x: 7, y: 0 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Pont ligne 4-1
+    932: { tileset: tilesetBridge1, x: 7, y: 2 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Pont ligne 4-2
+    411: { tileset: tilesetBridge1, x: 7, y: 3 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Pont ligne 4-3
+    412: { tileset: tilesetBridge1, x: 8, y: 0 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Pont ligne 5-1
+    933: { tileset: tilesetBridge1, x: 8, y: 2 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Pont ligne 5-2
+    414: { tileset: tilesetBridge1, x: 8, y: 3 , w: 1, h: 2, bonus: 0, bonus2: 0},  // Pont ligne 5-3
+
+    415: { tileset: tilesetBridge1, x: 2, y: 5 , w: 1, h: 1, bonus: 0, bonus2: 0},  // Pont support O
+    416: { tileset: tilesetBridge1, x: 7, y: 5 , w: 1, h: 1, bonus: 0, bonus2: 0}, // Pont support E
 
 //-------
 
