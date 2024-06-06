@@ -46,10 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameCanvas = document.getElementById('gameCanvas');
     const score = document.getElementById('score');
     const volumeControl = document.getElementById('volume');
+    const pauseVolumeControl = document.getElementById('pauseVolume'); // Contrôle du volume dans le menu de pause
+
 
     // Charger la valeur de volume à partir du stockage local
     if (localStorage.getItem('volume')) {
         volumeControl.value = localStorage.getItem('volume');
+        pauseVolumeControl.value = localStorage.getItem('volume');
         setVolume(localStorage.getItem('volume'));
     }
 
@@ -57,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
     volumeControl.addEventListener('input', () => {
         localStorage.setItem('volume', volumeControl.value);
         setVolume(volumeControl.value);
+    });
+
+    pauseVolumeControl.addEventListener('input', () => {
+        localStorage.setItem('volume', pauseVolumeControl.value);
+        setVolume(pauseVolumeControl.value);
     });
 
     function setVolume(volume) {
@@ -328,6 +336,7 @@ const coinFrames = {
 };
 const coinTileSize = 16; // Taille de chaque case dans le tileset de la pièce
 const coinFrameRate = 10; // Nombre de frames par seconde pour les pièces
+const coinOffset = 10;
 
 let currentCoin = null;
 
@@ -360,14 +369,11 @@ class Coin {
             frame.x * this.tileSize, frame.y * this.tileSize, this.tileSize, this.tileSize,
             this.x, this.y, this.size, this.size
         );
-        if (showCollision) {
-            this.drawCollisionBox(context);
-        }
     }
 
     drawCollisionBox(context) {
         const collisionX = this.x + (this.size - this.size) / 2;
-        const collisionY = this.y + (this.size - this.size) / 2;
+        const collisionY = this.y + (this.size - this.size) / 2  + coinOffset;
         context.strokeStyle = 'red';
         context.lineWidth = 2;
         context.strokeRect(collisionX, collisionY, this.size, this.size);
@@ -377,7 +383,7 @@ class Coin {
         const coinCenterX = this.x + this.size / 2;
         const coinCenterY = this.y + this.size / 2;
         const characterCenterX = characterX + characterSize / 2;
-        const characterCenterY = characterY + characterSize / 2;
+        const characterCenterY = characterY + characterSize / 2 - coinOffset;
         const distance = Math.sqrt(
             Math.pow(coinCenterX - characterCenterX, 2) + Math.pow(coinCenterY - characterCenterY, 2)
         );
@@ -443,6 +449,7 @@ class Enemy {
     }
 
     update(deltaTime) {
+
         this.x += this.speedX * deltaTime;
         this.y += this.speedY * deltaTime;
 
@@ -590,7 +597,7 @@ function spawnEnemy() {
 
 
 // Fonction pour ajouter un ennemi
-function addEnemy() {
+/*function addEnemy() {
     const newEnemy = new Enemy(gRI(0, canvas.width), gRI(0, canvas.height), gRI(20, 70), gRI(50, 300), gRI(50, 300), enemyImage);
     enemies.push(newEnemy);
 }
@@ -601,7 +608,7 @@ function removeEnemy(enemy) {
     if (index > -1) {
         enemies.splice(index, 1);
     }
-}
+}*/
 
 // Mettre à jour la position des ennemis
 function updateEnemies(deltaTime) {
@@ -665,6 +672,9 @@ function isCollisionBoxValid(x, y, width, height) {
 
 // Mettre à jour la position du personnage
 function update(deltaTime, timestamp) {
+
+    if (isPaused) return;
+
     let moveX = 0;
     let moveY = 0;
 
@@ -792,14 +802,6 @@ function drawCollisionBox(x, y, width, height) {
     context.strokeRect(x, y, width, height);
 }
 
-// Dessiner un message sur l'écran
-function drawMessage(message) {
-    context.font = '48px Arial';
-    context.fillStyle = 'black';
-    context.textAlign = 'center';
-    context.fillText(message, canvas.width / 2, canvas.height / 2);
-}
-
 function updateCharacterAnimation(deltaTime) {
     frameTime += deltaTime;
     if (frameTime >= 1 / frameRate) {
@@ -902,6 +904,8 @@ function drawEnemies() {
 function draw() {
     drawMap(map);
     drawEnemies();
+    if(currentCoin && showCollision)
+        currentCoin.drawCollisionBox(context);
 
     // Dessiner l'avertissement si présent
     if (warning) { // Afficher l'avertissement pendant 3 secondes
@@ -945,6 +949,150 @@ function drawWarning() {
 }
 
 
+// ------------------------------------------------------------- PAUSE -------------------------------------------------------------
+let isPaused = false;
+let lastPauseTime = 0;
+
+const pauseButton = document.getElementById('pauseButton');
+const resumeButton = document.getElementById('resumeButton');
+const pauseMenu = document.getElementById('pauseMenu');
+const gameSection = document.getElementById('gameSection');
+const pauseVolume = document.getElementById('pauseVolume');
+//const volumeControl = document.getElementById('volume'); // Assurez-vous que cet élément existe
+
+pauseButton.addEventListener('click', () => {
+    pauseGame();
+});
+
+resumeButton.addEventListener('click', () => {
+    resumeGame();
+});
+
+// Pause the game
+function pauseGame() {
+    isPaused = true;
+    playSound(blopSound);
+    lastPauseTime = performance.now(); // Enregistre le temps actuel
+    pauseMenu.style.display = 'flex';
+    gameSection.classList.add('paused');
+
+    pauseTimers();
+
+    // Synchronize the volume slider
+    pauseVolume.value = volumeControl.value;
+}
+
+// Resume the game
+function resumeGame() {
+    isPaused = false;
+    playSound(blopSound);
+    const pauseDuration = (performance.now() - lastPauseTime) / 1000; // Temps écoulé pendant la pause en secondes
+    lastTime += pauseDuration * 1000; // Ajuste lastTime en ajoutant la durée de la pause
+
+    pauseMenu.style.display = 'none';
+    gameSection.classList.remove('paused');
+
+    resumeTimers(); // Resume the custom timers
+    // Update volume from the pause menu slider
+    volumeControl.value = pauseVolume.value;
+    updateVolume();
+}
+
+// ------------------------------------------------------------- TIMER -------------------------------------------------------------
+
+let customTimeouts = [];
+let customIntervals = [];
+
+function customSetTimeout(callback, delay) {
+    const timeout = {
+        id: Date.now() + Math.random(),
+        callback,
+        delay,
+        start: performance.now(),
+        remaining: delay,
+        running: true
+    };
+    customTimeouts.push(timeout);
+
+    timeout.id = setTimeout(() => {
+        callback();
+        customTimeouts = customTimeouts.filter(t => t.id !== timeout.id);
+    }, delay);
+
+    return timeout.id;
+}
+
+function customSetInterval(callback, interval) {
+    const intervalObj = {
+        id: Date.now() + Math.random(),
+        callback,
+        interval,
+        start: performance.now(),
+        running: true
+    };
+    customIntervals.push(intervalObj);
+
+    intervalObj.id = setInterval(callback, interval);
+
+    return intervalObj.id;
+}
+
+function pauseTimers() {
+    customTimeouts.forEach(timeout => {
+        if (timeout.running) {
+            clearTimeout(timeout.id);
+            timeout.remaining -= performance.now() - timeout.start;
+            timeout.running = false;
+        }
+    });
+
+    customIntervals.forEach(interval => {
+        if (interval.running) {
+            clearInterval(interval.id);
+            interval.running = false;
+        }
+    });
+}
+
+function resumeTimers() {
+    customTimeouts.forEach(timeout => {
+        if (!timeout.running) {
+            timeout.start = performance.now();
+            timeout.id = setTimeout(() => {
+                timeout.callback();
+                customTimeouts = customTimeouts.filter(t => t.id !== timeout.id);
+            }, timeout.remaining);
+            timeout.running = true;
+        }
+    });
+
+    customIntervals.forEach(interval => {
+        if (!interval.running) {
+            interval.id = setInterval(interval.callback, interval.interval);
+            interval.running = true;
+        }
+    });
+}
+
+function clearCustomTimeout(id) {
+    customTimeouts = customTimeouts.filter(timeout => {
+        if (timeout.id === id) {
+            clearTimeout(timeout.id);
+            return false;
+        }
+        return true;
+    });
+}
+
+function clearCustomInterval(id) {
+    customIntervals = customIntervals.filter(interval => {
+        if (interval.id === id) {
+            clearInterval(interval.id);
+            return false;
+        }
+        return true;
+    });
+}
 
 
 // ------------------------------------------------------------- OTHER -------------------------------------------------------------
@@ -984,6 +1132,11 @@ let lastTime = 0;
 let startTime = null;
 function gameLoop(timestamp)
 {
+    if (isPaused) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+
     if (!startTime) startTime = timestamp;
     let deltaTime = (timestamp - lastTime) / 1000;
     let elapsedTime = (timestamp - startTime) / 1000;
@@ -993,13 +1146,13 @@ function gameLoop(timestamp)
         update(deltaTime, timestamp);
     else
     updateDeath(deltaTime);
-updateCharacterAnimation(deltaTime);
-updateEnemies(deltaTime);
-draw();
+    updateCharacterAnimation(deltaTime);
+    updateEnemies(deltaTime);
+    draw();
 
-checkCollisions();
+    checkCollisions();
 
-requestAnimationFrame(gameLoop);
+    requestAnimationFrame(gameLoop);
 }
 
 // Démarrer le jeu
@@ -1056,13 +1209,13 @@ function startGame()
     playSound(blopSound);
 
 
-    setTimeout(() => {
+    customSetTimeout(() => {
         spawnEnemy();
         placeRandomCoin();
     
         // Then spawn enemies every 10 seconds
-        setInterval(spawnEnemy, 10000); // 10000 ms = 10 seconds
-    }, 5000); // 5000 ms = 5 seconds
+        customSetInterval(spawnEnemy, 10000); // 10000 ms = 10 seconds
+    }, 5000); // 5000 ms = 5 seconds    
 }
 
 // Assurez-vous que les images sont chargées avant de démarrer la boucle de jeu

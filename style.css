@@ -12,19 +12,36 @@ body {
 
 .container {
     text-align: center;
-    background-image: url('src/planches.png');
-    background-size: cover;
-    background-position: center;
     width: 100%;
     height: 100%;
     display: none; /* Hide all containers by default */
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: relative; /* Ensures that the ::before overlay works */
 }
 
 #mainMenu {
+    background-image: url('src/planches.png');
+    background-size: cover;
+    background-position: center;
     display: flex; /* Display only the main menu by default */
+}
+
+#pauseMenu {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    text-align: center;
+    z-index: 20;
 }
 
 h1 {
@@ -40,7 +57,7 @@ h1 {
     margin-bottom: 20px; /* Ajustez l'espacement sous le conteneur si nécessaire */
 }
 
-#ruinsButton, #sanctuaryButton, #canalButton, #retryButton {
+#ruinsButton, #sanctuaryButton, #canalButton, #retryButton ,#pauseButton ,#resumeButton{
     padding: 15px 30px;
     font-size: 1.5em;
     color: #ffffff;
@@ -52,12 +69,12 @@ h1 {
     transition: background-color 0.3s, transform 0.3s;
 }
 
-#startButton:hover, #retryButton:hover {
+#startButton:hover, #retryButton:hover, #pauseButton:hover ,#resumeButton:hover {
     background-color: #e64a19;
     transform: scale(1.05);
 }
 
-#startButton:active, #retryButton:active {
+#startButton:active, #retryButton:active, #pauseButton:active ,#resumeButton:active {
     background-color: #d84315;
     transform: scale(1);
 }
@@ -106,7 +123,7 @@ h1 {
 
 .volume-control {
     position: fixed;
-    bottom: 30px;
+    margin-top: 20px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -138,3 +155,60 @@ h1 {
     cursor: pointer;
     text-align: center;
 }
+
+#pauseButton ,#resumeButton{
+    margin-top: 40px;
+    padding: 10px 20px;
+    font-size: 1.5em;
+    background-color: #ff5722;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+#gameSection {
+    background-image: url('src/planches.png');
+    background-size: cover;
+    background-position: center;
+    position: relative; /* Ensure that the ::before overlay works */
+}
+
+#pauseMenu {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+    color: #ffffff;
+    text-align: center;
+    z-index: 20; /* Ensure the pause menu is above the game section */
+}
+
+#gameSection.paused::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+    z-index: 10; /* Ensure the overlay is above the game canvas but below the pause menu */
+}
+
+#resumeButton {
+    margin-top: 70px; /* Ajouter un espace au-dessus du bouton */
+    padding: 10px 20px;
+    font-size: 1.5em;
+    background-color: #ff5722;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
