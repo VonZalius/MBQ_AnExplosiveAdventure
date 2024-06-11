@@ -5,7 +5,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #1a1a1a;
+    background-color: #283a3d;
     color: #ffffff;
     font-family: 'Arial', sans-serif;
 }
@@ -21,11 +21,14 @@ body {
     position: relative; /* Ensures that the ::before overlay works */
 }
 
+#initialScreen {
+    display: flex; /* Display the initial screen by default */
+}
+
 #mainMenu {
     background-image: url('src/planches.png');
     background-size: cover;
     background-position: center;
-    display: flex; /* Display only the main menu by default */
 }
 
 #pauseMenu {
@@ -57,7 +60,7 @@ h1 {
     margin-bottom: 20px; /* Ajustez l'espacement sous le conteneur si nécessaire */
 }
 
-#ruinsButton, #sanctuaryButton, #canalButton, #retryButton ,#pauseButton ,#resumeButton{
+button {
     padding: 15px 30px;
     font-size: 1.5em;
     color: #ffffff;
@@ -69,12 +72,12 @@ h1 {
     transition: background-color 0.3s, transform 0.3s;
 }
 
-#startButton:hover, #retryButton:hover, #pauseButton:hover ,#resumeButton:hover {
+button:hover {
     background-color: #e64a19;
     transform: scale(1.05);
 }
 
-#startButton:active, #retryButton:active, #pauseButton:active ,#resumeButton:active {
+button:active {
     background-color: #d84315;
     transform: scale(1);
 }
@@ -122,12 +125,11 @@ h1 {
 }
 
 .volume-control {
-    position: fixed;
     margin-top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    margin-bottom: 20px;
     text-align: center;
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
@@ -136,42 +138,24 @@ h1 {
     margin-left: 10px;
 }
 
-.score-container {
-    font-size: 2em;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-    display: none;
-}
-
-#retryButton {
-    display: none;
-    margin-top: 40px; /* Increase margin-top for more separation */
-    padding: 10px 20px;
-    font-size: 1.5em;
-    background-color: #ff5722;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-}
-
-#pauseButton ,#resumeButton{
-    margin-top: 40px;
-    padding: 10px 20px;
-    font-size: 1.5em;
-    background-color: #ff5722;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-}
-
 #gameSection {
     background-image: url('src/planches.png');
     background-size: cover;
     background-position: center;
     position: relative; /* Ensure that the ::before overlay works */
+    padding: 20px; /* Add padding around the game section */
+}
+
+#retryButton {
+    margin-top: 20px; /* Add margin above the retry button */
+}
+
+#pauseButton {
+    margin-top: 20px; /* Add margin above the pause button */
+}
+
+#pauseMenu .volume-control {
+    margin-top: 20px; /* Add margin above the volume control in the pause menu */
 }
 
 #pauseMenu {
@@ -197,18 +181,14 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
     z-index: 10; /* Ensure the overlay is above the game canvas but below the pause menu */
 }
 
-#resumeButton {
-    margin-top: 70px; /* Ajouter un espace au-dessus du bouton */
-    padding: 10px 20px;
-    font-size: 1.5em;
-    background-color: #ff5722;
-    color: #fff;
-    border: none;
-    cursor: pointer;
+.score-container {
+    font-size: 3em; /* Increase the font size for the score */
+    font-weight: bold;
+    margin-bottom: 20px;
     text-align: center;
+    display: none;
 }
-

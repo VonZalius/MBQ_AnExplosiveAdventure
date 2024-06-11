@@ -1,6 +1,11 @@
 import { tilesetGround, tileSize, tileImages } from './tiles.js';
 
 // Obtenir les éléments du DOM
+const startAdventureButton = document.getElementById('startAdventureButton');
+const mainMenu = document.getElementById('mainMenu');
+const initialScreen = document.getElementById('initialScreen');
+
+
 const startButton = document.getElementById('startButton');
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
@@ -37,6 +42,17 @@ document.addEventListener('keydown', function(event) {
 });
 document.addEventListener('keyup', function(event) {
     keys[event.code] = false;
+});
+
+// Afficher le menu principal et jouer la musique lorsque le bouton est cliqué
+startAdventureButton.addEventListener('click', () => {
+    initialScreen.style.display = 'none';
+    mainMenu.style.display = 'flex';
+    if (!isBackgroundMusicPlaying) {
+        backgroundMusic.play();
+        isBackgroundMusicPlaying = true;
+    }
+    playSound(impactSound);
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -124,6 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
         score.style.display = 'none';
         ruinsButton.style.display = 'inline'; // Afficher le bouton Ruines
         sanctuaryButton.style.display = 'inline'; // Afficher le bouton Sanctuaire
+
+        playSound(blopSound);
 
         // Reset game logic here
     });
@@ -240,7 +258,7 @@ const characterFrames = {
     ]
 };
 const charactertileSize = 32; // Taille de chaque case dans le tileset
-const characterFoot = 4;
+const characterFoot = 3.5;
 let currentDirection = 'left';
 let currentFrameIndex = 0;
 let frameRate = 10; // Nombre de frames par seconde
@@ -631,6 +649,7 @@ function checkCollisions() {
             isDead = true;
             playSound(deathSound); // Jouer le son de mort
             GameMusic.pause();
+            deathMusic.currentTime = 0;
             deathMusic.play();
             if (currentDirection == 'right' || currentDirection == 'walkRight')
                 currentDirection = 'deadRight';
@@ -790,6 +809,11 @@ function updateDeath(deltaTime) {
 
 // Ajouter un écouteur d'événements au bouton pour recharger la page
 document.getElementById('retryButton').addEventListener('click', function() {
+    /*GameMusic.pause();
+    deathMusic.pause()
+    backgroundMusic.currentTime = 0;
+    backgroundMusic.play();*/
+    blopSound.play();
     location.reload();
 });
 
@@ -1167,7 +1191,7 @@ function startGame()
     requestAnimationFrame(gameLoop);
 
     backgroundMusic.pause();
-    backgroundMusic.src = '';
+    //backgroundMusic.src = '';
 
     
     
@@ -1188,6 +1212,7 @@ function startGame()
         map = Canal;
     }
 
+    GameMusic.currentTime = 0;
     GameMusic.play();
 
     characterSize = baseCharacterSize * (baseMapSize / map.length);
