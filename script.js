@@ -55,21 +55,84 @@ startAdventureButton.addEventListener('click', () => {
     playSound(impactSound);
 });
 
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        if (isPaused) {
+            resumeGame();
+        } else {
+            pauseGame();
+        }
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const retryButton = document.getElementById('retryButton');
     const mainMenu = document.getElementById('mainMenu');
     const gameSection = document.getElementById('gameSection');
-    const gameCanvas = document.getElementById('gameCanvas');
-    const score = document.getElementById('score');
+    const initialScreen = document.getElementById('initialScreen');
+    const scoreElement = document.getElementById('score');
     const volumeControl = document.getElementById('volume');
-    const pauseVolumeControl = document.getElementById('pauseVolume'); // Contrôle du volume dans le menu de pause
+    const pauseVolumeControl = document.getElementById('pauseVolume');
 
+    let currentVolume = 0.5; // Volume initial
+
+    const audioElements = [
+        document.getElementById('backgroundMusic'),
+        document.getElementById('gameMusic1'),
+        document.getElementById('gameMusic2'),
+        document.getElementById('gameMusic3'),
+        document.getElementById('deathMusic'),
+        document.getElementById('deathSound'),
+        document.getElementById('coinSound'),
+        document.getElementById('magicSound'),
+        document.getElementById('blopSound'),
+        document.getElementById('impactSound'),
+        document.getElementById('footStepSound')
+    ];
+
+    function getHighScores(map) {
+        const highScores = JSON.parse(localStorage.getItem(`highScores_${map}`)) || [];
+        return highScores;
+    }
+
+    function saveHighScore(map, score) {
+        const highScores = getHighScores(map);
+        highScores.push(score);
+        highScores.sort((a, b) => b - a);
+        highScores.splice(5);
+        localStorage.setItem(`highScores_${map}`, JSON.stringify(highScores));
+    }
+
+    function displayHighScores(map, listId) {
+        const highScores = getHighScores(map);
+        const highScoresList = document.getElementById(listId);
+        highScoresList.innerHTML = highScores.map(score => `<li>${score}</li>`).join('');
+    }
+
+    function displayAllHighScores() {
+        displayHighScores('ruins', 'ruinsHighScoresList');
+        displayHighScores('sanctuary', 'sanctuaryHighScoresList');
+        displayHighScores('canal', 'canalHighScoresList');
+    }
+
+    displayAllHighScores(); // Afficher les scores lorsque le DOM est chargé
 
     // Charger la valeur de volume à partir du stockage local
     if (localStorage.getItem('volume')) {
         volumeControl.value = localStorage.getItem('volume');
         pauseVolumeControl.value = localStorage.getItem('volume');
         setVolume(localStorage.getItem('volume'));
+    }
+
+    // Vérifier si on doit afficher directement le menu de sélection des cartes
+    if (localStorage.getItem('showMainMenu') === 'true') {
+        initialScreen.style.display = 'none';
+        mainMenu.style.display = 'flex';
+        localStorage.removeItem('showMainMenu'); // Supprimer la variable après utilisation
+        if (!isBackgroundMusicPlaying) {
+            backgroundMusic.play();
+            isBackgroundMusicPlaying = true;
+        }
     }
 
     // Enregistrer la valeur de volume dans le stockage local
@@ -84,18 +147,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function setVolume(volume) {
+        currentVolume = volume; // Mettre à jour la variable globale
         audioElements.forEach(audio => {
             audio.volume = volume;
         });
     }
-
 
     document.addEventListener('keydown', function(event) {
         if (!isBackgroundMusicPlaying) {
             backgroundMusic.play();
             isBackgroundMusicPlaying = true;
         }
-        // Autres logiques de gestion des touches ici...
     });
 
     ruinsButton.addEventListener('click', () => {
@@ -103,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mainMenu.style.display = 'none';
         gameSection.style.display = 'flex';
         gameCanvas.style.display = 'block';
-        score.style.display = 'block';
+        scoreElement.style.display = 'block';
         startGame();
     });
 
@@ -112,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mainMenu.style.display = 'none';
         gameSection.style.display = 'flex';
         gameCanvas.style.display = 'block';
-        score.style.display = 'block';
+        scoreElement.style.display = 'block';
         startGame();
     });
 
@@ -121,31 +183,50 @@ document.addEventListener('DOMContentLoaded', () => {
         mainMenu.style.display = 'none';
         gameSection.style.display = 'flex';
         gameCanvas.style.display = 'block';
-        score.style.display = 'block';
+        scoreElement.style.display = 'block';
         startGame();
     });
 
-    /*startButton.addEventListener('click', () => {
-        mainMenu.style.display = 'none';
-        gameSection.style.display = 'flex';
-        gameCanvas.style.display = 'block';
-        score.style.display = 'block';
-        // Start game logic here
-    });*/
-
     retryButton.addEventListener('click', () => {
-        mainMenu.style.display = 'flex';
-        gameSection.style.display = 'none';
-        gameCanvas.style.display = 'none';
-        score.style.display = 'none';
-        ruinsButton.style.display = 'inline'; // Afficher le bouton Ruines
-        sanctuaryButton.style.display = 'inline'; // Afficher le bouton Sanctuaire
-
-        playSound(blopSound);
-
-        // Reset game logic here
+        localStorage.setItem('showMainMenu', 'true');
+        location.reload();
     });
+
+    document.getElementById('retryButton').addEventListener('click', function() {
+        if (BUTTONTYPE === 1) {
+            saveHighScore('ruins', score);
+        } else if (BUTTONTYPE === 2) {
+            saveHighScore('sanctuary', score);
+        } else if (BUTTONTYPE === 3) {
+            saveHighScore('canal', score);
+        }
+        location.reload();
+    });
+
+    // Ajuster le volume dès le chargement
+    setVolume(currentVolume);
+
+    // Jouer le son d'impact avec le volume défini
+    startAdventureButton.addEventListener('click', () => {
+        initialScreen.style.display = 'none';
+        mainMenu.style.display = 'flex';
+        if (!isBackgroundMusicPlaying) {
+            backgroundMusic.play();
+            isBackgroundMusicPlaying = true;
+        }
+        playSound(impactSound); // Utiliser la fonction playSound pour appliquer le volume
+    });
+
+    function playSound(sound) {
+        const soundClone = sound.cloneNode();
+        soundClone.volume = currentVolume; // Définir le volume du clone
+        soundClone.play();
+    }
 });
+
+
+
+
 
 // ------------------------------------------------------------- VOLUME -------------------------------------------------------------
 
@@ -424,6 +505,21 @@ function placeRandomCoin() {
         coinTileSize,
         coinFrameRate
     );
+}
+
+// ------------------------------------------------------------- SCORES -------------------------------------------------------------
+
+function getHighScores() {
+    const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+    return highScores;
+}
+
+function saveHighScore(score) {
+    const highScores = getHighScores();
+    highScores.push(score);
+    highScores.sort((a, b) => b - a); // Trier les scores par ordre décroissant
+    highScores.splice(5); // Conserver uniquement les 5 meilleurs scores
+    localStorage.setItem('highScores', JSON.stringify(highScores));
 }
 
 function updateScore() {
@@ -814,6 +910,7 @@ document.getElementById('retryButton').addEventListener('click', function() {
     backgroundMusic.currentTime = 0;
     backgroundMusic.play();*/
     blopSound.play();
+    localStorage.setItem('showMainMenu', 'true');
     location.reload();
 });
 

@@ -23,6 +23,9 @@ body {
 
 #initialScreen {
     display: flex; /* Display the initial screen by default */
+    background-image: url('src/planches.png');
+    background-size: cover;
+    background-position: center;
 }
 
 #mainMenu {
@@ -64,7 +67,7 @@ button {
     padding: 15px 30px;
     font-size: 1.5em;
     color: #ffffff;
-    background-color: #ff5722;
+    background-color: #356175;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -73,12 +76,12 @@ button {
 }
 
 button:hover {
-    background-color: #e64a19;
+    background-color: #3794b1;
     transform: scale(1.05);
 }
 
 button:active {
-    background-color: #d84315;
+    background-color: #3794b1;
     transform: scale(1);
 }
 
@@ -125,18 +128,54 @@ button:active {
 }
 
 .volume-control {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-.volume-control input {
+.volume-control input[type="range"] {
+    -webkit-appearance: none;
     width: 100px;
-    margin-left: 10px;
+    height: 10px;
+    background: #ddd;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #356175;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.volume-control input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #356175;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.volume-control input[type="range"]::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    background: #356175;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+
 
 #gameSection {
     background-image: url('src/planches.png');
@@ -192,3 +231,53 @@ button:active {
     text-align: center;
     display: none;
 }
+
+#highScoresSection {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#highScoresSection h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#highScoresContainer {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
+    gap: 20px; /* Ajouter de l'espace entre les colonnes */
+}
+
+.highScoresColumn {
+    width: 30%;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.highScoresColumn h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.highScoresColumn ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    font-size: 1.2em;
+    color: #ffffff;
+}
+
+.highScoresColumn ul li {
+    margin: 5px 0;
+}
+
+
+
+

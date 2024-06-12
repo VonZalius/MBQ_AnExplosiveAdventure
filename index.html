@@ -9,18 +9,34 @@
 <body>
 
     <div id="initialScreen" class="container">
-        <button id="startAdventureButton">Partir à l'aventure</button>
+        <button id="startAdventureButton">Débuter votre aventure</button>
     </div>
 
     <div id="mainMenu" class="container">
         <audio id="backgroundMusic" src="src/mp3/Pixel 3.mp3" loop></audio>
-        <h1>Une petite aventure commence...</h1>
+        <h1>Choisissez le lieu à explorer</h1>
         <div id="buttonContainer">
-            <button id="ruinsButton">Ruines</button>
-            <button id="sanctuaryButton">Sanctuaire</button>
-            <button id="canalButton">Canal</button>
+            <button id="ruinsButton">Les Ruines</button>
+            <button id="sanctuaryButton">Le Sanctuaire</button>
+            <button id="canalButton">Le Canal</button>
         </div>
-        
+        <div id="highScoresSection">
+            <h2>Meilleurs Scores Personnel</h2>
+            <div id="highScoresContainer">
+                <div class="highScoresColumn" id="ruinsHighScores">
+                    <h3>Ruines</h3>
+                    <ul id="ruinsHighScoresList"></ul>
+                </div>
+                <div class="highScoresColumn" id="sanctuaryHighScores">
+                    <h3>Sanctuaire</h3>
+                    <ul id="sanctuaryHighScoresList"></ul>
+                </div>
+                <div class="highScoresColumn" id="canalHighScores">
+                    <h3>Canal</h3>
+                    <ul id="canalHighScoresList"></ul>
+                </div>
+            </div>
+        </div>
         <div id="commands">
             <h2>Commandes du jeu</h2>
             <ul>
@@ -37,6 +53,9 @@
             </div>
         </div>
     </div>
+    
+    
+    
     
     <div id="gameSection" class="container">
         <div class="score-container" id="score">Pièces collectées : 0</div>
@@ -75,7 +94,7 @@
         <button id="resumeButton">Reprendre</button>
     </div>    
 
-    <div id="version">Version 1.0.3</div>
+    <div id="version">Version 1.0.4</div>
     <script type="module" src="script.js"></script>
 </body>
 </html>
