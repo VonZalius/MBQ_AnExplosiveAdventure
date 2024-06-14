@@ -278,6 +278,12 @@ button:active {
     margin: 5px 0;
 }
 
+#gameCanvas.bonus-speed {
+    border: 5px solid rgb(49, 195, 231);
+}
 
+#gameCanvas.bonus-strenght {
+    border: 5px solid rgb(223, 61, 56);
+}
 
 

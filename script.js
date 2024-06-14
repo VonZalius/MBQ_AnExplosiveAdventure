@@ -23,6 +23,7 @@ const magicSound = document.getElementById('magicSound');
 const blopSound = document.getElementById('blopSound');
 const impactSound = document.getElementById('impactSound');
 const footStepSound = document.getElementById('footStepSound');
+const bonusSound = document.getElementById('bonusSound');
 
 let BUTTONTYPE; // Déclaration de la variable
 
@@ -87,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('magicSound'),
         document.getElementById('blopSound'),
         document.getElementById('impactSound'),
-        document.getElementById('footStepSound')
+        document.getElementById('footStepSound'),
+        document.getElementById('bonusSound')
     ];
 
     function getHighScores(map) {
@@ -247,7 +249,8 @@ const audioElements = [
     document.getElementById('magicSound'),
     document.getElementById('blopSound'),
     document.getElementById('impactSound'),
-    document.getElementById('footStepSound')
+    document.getElementById('footStepSound'),
+    document.getElementById('bonusSound')
 ];
 
 // Fonction pour mettre à jour le volume de tous les éléments audio
@@ -418,6 +421,170 @@ const Canal = [
 ];
 //const m = gRI(1, 1);
 
+
+// ------------------------------------------------------------- BONUS -------------------------------------------------------------
+
+const bonusImage = new Image();
+const bonusFrames = {
+    spin: [
+        { x: 0, y: 0 }, // Frame 1
+        { x: 1, y: 0 }, // Frame 2
+        { x: 2, y: 0 }, // Frame 3
+        { x: 0, y: 1 },  // Frame 4
+        { x: 1, y: 1 },  // Frame 5
+        { x: 2, y: 1 }, // Frame 3
+        { x: 0, y: 2 },  // Frame 4
+        { x: 1, y: 2 }  // Frame 5
+    ]
+};
+const bonusTileSize = 16; // Taille de chaque case dans le tileset du bonus
+const bonusFrameRate = 10; // Nombre de frames par seconde pour les bonus
+const bonusOffset = 10;
+
+class Bonus {
+    constructor(x, y, size, image, frames, tileSize, frameRate) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.image = image;
+        this.frames = frames;
+        this.tileSize = tileSize;
+        this.frameRate = frameRate;
+        this.currentFrameIndex = 0;
+        this.frameTime = 0;
+    }
+
+    update(deltaTime) {
+        // Mettre à jour l'animation
+        this.frameTime += deltaTime;
+        if (this.frameTime >= 1 / this.frameRate) {
+            this.currentFrameIndex = (this.currentFrameIndex + 1) % this.frames.spin.length;
+            this.frameTime = 0;
+        }
+    }
+
+    draw(context) {
+        const frame = this.frames.spin[this.currentFrameIndex];
+        context.drawImage(
+            this.image,
+            frame.x * this.tileSize, frame.y * this.tileSize, this.tileSize, this.tileSize,
+            this.x, this.y, this.size, this.size
+        );
+    }
+
+    drawCollisionBox(context) {
+        const collisionX = this.x + (this.size - this.size) / 2;
+        const collisionY = this.y + (this.size - this.size) / 2 + bonusOffset;
+        context.strokeStyle = 'blue';
+        context.lineWidth = 2;
+        context.strokeRect(collisionX, collisionY, this.size, this.size);
+    }
+
+    checkCollision(characterX, characterY, characterSize) {
+        const bonusCenterX = this.x + this.size / 2;
+        const bonusCenterY = this.y + this.size / 2;
+        const characterCenterX = characterX + characterSize / 2;
+        const characterCenterY = characterY + characterSize / 2 - bonusOffset;
+        const distance = Math.sqrt(
+            Math.pow(bonusCenterX - characterCenterX, 2) + Math.pow(bonusCenterY - characterCenterY, 2)
+        );
+        return distance < (this.size / 2 + characterSize / 2);
+    }
+}
+
+let currentBonus = null;
+let coinsCollectedSinceLastBonus = 0;
+let bonusType;
+let bonusTimer = null;
+let flashTimer = null;
+let flashInterval = null;
+
+let speedBoostActive = false;
+let bonusSpeed = 1.5;
+let bonusSpeedTime = 7;
+
+function speedBonus()
+{
+    speedBoostActive = true;
+    canvas.classList.add('bonus-speed');
+    //characterSpeed *= 2; // Doubler la vitesse
+    if (bonusTimer) {
+        clearTimeout(bonusTimer);
+    }
+    if (flashTimer) {
+        clearTimeout(flashTimer);
+    }
+    if (flashInterval) {
+        clearInterval(flashInterval);
+    }
+
+    flashTimer = setTimeout(() => {
+        flashInterval = setInterval(() => {
+            canvas.classList.toggle('bonus-speed');
+        }, 200); // Clignotement toutes les 200ms
+    }, 1000 * bonusSpeedTime); // Commencer le clignotement après 4 secondes
+
+    bonusTimer = setTimeout(() => {
+        speedBoostActive = false;
+        canvas.classList.remove('bonus-speed'); // Retirer le contour bleu
+        clearInterval(flashInterval); // Arrêter le clignotement
+    }, 1000 * bonusSpeedTime + 2000);
+    currentBonus = null;
+}
+
+let strenghtBoostActive = false;
+let bonusStrenghtTime = 2;
+
+function strenghtBonus()
+{
+    strenghtBoostActive = true;
+    canvas.classList.add('bonus-strenght');
+    if (bonusTimer) {
+        clearTimeout(bonusTimer);
+    }
+    if (flashTimer) {
+        clearTimeout(flashTimer);
+    }
+    if (flashInterval) {
+        clearInterval(flashInterval);
+    }
+    flashTimer = setTimeout(() => {
+        flashInterval = setInterval(() => {
+            canvas.classList.toggle('bonus-strenght');
+        }, 200); // Clignotement toutes les 200ms
+    }, 1000 * bonusStrenghtTime); // Commencer le clignotement après 4 secondes
+
+    bonusTimer = setTimeout(() => {
+        speedBoostActive = false;
+        canvas.classList.remove('bonus-strenght'); // Retirer le contour bleu
+        clearInterval(flashInterval); // Arrêter le clignotement
+    }, 1000 * bonusStrenghtTime + 2000);
+    currentBonus = null;
+}
+
+function placeRandomBonus() {
+    bonusType = gRI(1, 3);
+    if (bonusType == 1)
+        bonusImage.src = 'src/bonus/blue.png';
+    if (bonusType == 2)
+        bonusImage.src = 'src/bonus/red.png';
+    const positions100 = getAllPositions(map, 900);
+    const randomPosition = getRandomPosition(positions100);
+    const tileWidth = canvas.width / map[0].length;
+    const tileHeight = canvas.height / map.length;
+    const bonusSize = tileWidth; // Taille du bonus
+    currentBonus = new Bonus(
+        randomPosition.col * tileWidth + (tileWidth - bonusSize) / 2,
+        randomPosition.row * tileHeight + (tileHeight - bonusSize) / 2,
+        bonusSize,
+        bonusImage,
+        bonusFrames,
+        bonusTileSize,
+        bonusFrameRate
+    );
+}
+
+
 // ------------------------------------------------------------- COINS -------------------------------------------------------------
 
 let score = 0;
@@ -473,7 +640,7 @@ class Coin {
     drawCollisionBox(context) {
         const collisionX = this.x + (this.size - this.size) / 2;
         const collisionY = this.y + (this.size - this.size) / 2  + coinOffset;
-        context.strokeStyle = 'red';
+        context.strokeStyle = 'blue';
         context.lineWidth = 2;
         context.strokeRect(collisionX, collisionY, this.size, this.size);
     }
@@ -736,7 +903,7 @@ function checkCollisions() {
     const collisionX = characterX + (characterSize - collisionBoxSize) / 2;
     const collisionY = characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY;
     for (const enemy of enemies) {
-        if (enemy.checkCollision(collisionX, collisionY, collisionBoxSize)) {
+        if (enemy.checkCollision(collisionX, collisionY, collisionBoxSize) && !strenghtBoostActive) {
             //alert('Vous avez été touché par un ennemi !');
             // Réinitialiser le jeu
             enemies.length = 0;
@@ -860,6 +1027,9 @@ function update(deltaTime, timestamp) {
         moveX /= Math.sqrt(2);
         moveY /= Math.sqrt(2);
     }
+
+    if (speedBoostActive)
+        characterSpeed *= bonusSpeed;
     
     // Calculer la nouvelle position de la boîte de collision
     const newCollisionX = characterX + moveX + (characterSize - collisionBoxSize) / 2;
@@ -882,13 +1052,35 @@ function update(deltaTime, timestamp) {
     // Vérifier les collisions avec les pièces
     if (currentCoin && currentCoin.checkCollision(characterX + (characterSize - collisionBoxSize) / 2, characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY, collisionBoxSize)) {
         score += 1;
+        if (!currentBonus)
+            coinsCollectedSinceLastBonus += 1;
         playSound(coinSound); // Jouer le son de pièce
         updateScore();
         placeRandomCoin();
+
+        // Placer un bonus si 5 pièces ont été collectées et qu'aucun bonus n'est actif
+        if (coinsCollectedSinceLastBonus >= 5 && !currentBonus) {
+            placeRandomBonus();
+            coinsCollectedSinceLastBonus = 0; // Réinitialiser le compteur
+        }
     }
+
+    if (currentBonus && currentBonus.checkCollision(characterX + (characterSize - collisionBoxSize) / 2, characterY + (characterSize - collisionBoxSize) / 2 + collisionOffsetY, collisionBoxSize)) {
+        playSound(bonusSound); // Jouer le son de bonus
+        if (bonusType == 1)
+            speedBonus();
+        if (bonusType == 2)
+            strenghtBonus();
+    }
+
     // Mettre à jour l'animation de la pièce
     if (currentCoin) {
         currentCoin.update(deltaTime);
+    }
+
+    // Mettre à jour l'animation du bonus
+    if (currentBonus) {
+        currentBonus.update(deltaTime);
     }
 }
 
@@ -1011,6 +1203,13 @@ function drawMap(map) {
                     currentCoin.draw(context);
                 }
             }
+
+            if (currentBonus) {
+                const bonusRow = Math.floor(currentBonus.y / tileHeight);
+                if (row === bonusRow) {
+                    currentBonus.draw(context);
+                }
+            }
         }
     }
 }
@@ -1027,6 +1226,10 @@ function draw() {
     drawEnemies();
     if(currentCoin && showCollision)
         currentCoin.drawCollisionBox(context);
+
+    if (currentBonus && showCollision) {
+        currentBonus.drawCollisionBox(context);
+    }
 
     // Dessiner l'avertissement si présent
     if (warning) { // Afficher l'avertissement pendant 3 secondes
