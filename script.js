@@ -555,7 +555,7 @@ function strenghtBonus()
     }, 1000 * bonusStrenghtTime); // Commencer le clignotement après 4 secondes
 
     bonusTimer = setTimeout(() => {
-        speedBoostActive = false;
+        strenghtBoostActive = false;
         canvas.classList.remove('bonus-strenght'); // Retirer le contour bleu
         clearInterval(flashInterval); // Arrêter le clignotement
     }, 1000 * bonusStrenghtTime + 2000);
