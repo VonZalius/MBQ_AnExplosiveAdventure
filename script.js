@@ -46,10 +46,6 @@ document.addEventListener('keyup', function(event) {
 
 // Afficher le menu principal et jouer la musique lorsque le bouton est cliqué
 startAdventureButton.addEventListener('click', () => {
-
-    pauseVolume.value = volumeControl.value;
-    volumeControl.value = pauseVolume.value;
-
     initialScreen.style.display = 'none';
     mainMenu.style.display = 'flex';
     if (!isBackgroundMusicPlaying) {
@@ -228,72 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ------------------------------------------------------------- MANETTE -------------------------------------------------------------
 
-window.addEventListener("gamepadconnected", (event) => {
-    console.log("A gamepad connected:");
-    console.log(event.gamepad);
-});
-
-window.addEventListener("gamepaddisconnected", (event) => {
-    console.log("A gamepad disconnected:");
-    console.log(event.gamepad);
-});
-
-function handleGamepadInput() {
-    const gamepads = navigator.getGamepads();
-    const gamepad = gamepads[0]; // Supposons que nous utilisons la première manette
-
-    if (gamepad) {
-        // Déplacements avec les sticks analogiques
-        const moveX = gamepad.axes[0]; // Axe horizontal du stick gauche
-        const moveY = gamepad.axes[1]; // Axe vertical du stick gauche
-
-        if (moveX < -0.5) {
-            // Déplacer à gauche
-            keys['ArrowLeft'] = true;
-        } else if (moveX > 0.5) {
-            // Déplacer à droite
-            keys['ArrowRight'] = true;
-        } else {
-            keys['ArrowLeft'] = false;
-            keys['ArrowRight'] = false;
-        }
-
-        if (moveY < -0.5) {
-            // Déplacer vers le haut
-            keys['ArrowUp'] = true;
-        } else if (moveY > 0.5) {
-            // Déplacer vers le bas
-            keys['ArrowDown'] = true;
-        } else {
-            keys['ArrowUp'] = false;
-            keys['ArrowDown'] = false;
-        }
-
-        // Actions avec les boutons
-        if (gamepad.buttons[0].pressed) {
-            // Bouton A pressé (ou équivalent)
-            keys['Space'] = true;
-        } else {
-            keys['Space'] = false;
-        }
-
-        if (gamepad.buttons[4].pressed) {
-            // Bouton LB pressé (ou équivalent)
-            keys['ShiftLeft'] = true;
-        } else {
-            keys['ShiftLeft'] = false;
-        }
-
-        if (gamepad.buttons[9].pressed) {
-            // Bouton LB pressé (ou équivalent)
-            keys['Escape'] = true;
-        } else {
-            keys['Escape'] = false;
-        }
-    }
-}
 
 
 
@@ -1332,8 +1263,6 @@ function gameLoop(timestamp)
     let elapsedTime = (timestamp - startTime) / 1000;
     lastTime = timestamp;
 
-    handleGamepadInput();
-
     if (!isDead)
         update(deltaTime, timestamp);
     else
@@ -1361,8 +1290,7 @@ function startGame()
     backgroundMusic.pause();
     //backgroundMusic.src = '';
 
-    pauseVolume.value = volumeControl.value;
-    volumeControl.value = pauseVolume.value;
+    
     
     const m = BUTTONTYPE;
     if (m ==1)
