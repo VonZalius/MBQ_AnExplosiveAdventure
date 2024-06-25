@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Une Aventure</title>
+    <title>An explosive Adventure</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="initialScreen" class="container">
-        <button id="startAdventureButton">Débuter votre aventure</button>
+        <button id="startAdventureButton">Start your journey</button>
     </div>
 
     <div id="mainMenu" class="container">
         <audio id="backgroundMusic" src="src/mp3/Pixel 3.mp3" loop></audio>
-        <h1>Choisissez le lieu à explorer</h1>
+        <h1>Choose a location to explore</h1>
         <div id="buttonContainer">
-            <button id="ruinsButton">Les Ruines</button>
-            <button id="sanctuaryButton">Le Sanctuaire</button>
-            <button id="canalButton">Le Canal</button>
+            <button id="ruinsButton">The Ruins</button>
+            <button id="sanctuaryButton">The Sanctuary</button>
+            <button id="canalButton">The Canal</button>
         </div>
         <div id="highScoresSection">
-            <h2>Meilleurs Scores Personnel</h2>
+            <h2>High Score</h2>
             <div id="highScoresContainer">
                 <div class="highScoresColumn" id="ruinsHighScores">
-                    <h3>Ruines</h3>
+                    <h3>Ruins</h3>
                     <ul id="ruinsHighScoresList"></ul>
                 </div>
                 <div class="highScoresColumn" id="sanctuaryHighScores">
-                    <h3>Sanctuaire</h3>
+                    <h3>Sanctuary</h3>
                     <ul id="sanctuaryHighScoresList"></ul>
                 </div>
                 <div class="highScoresColumn" id="canalHighScores">
@@ -38,15 +38,15 @@
             </div>
         </div>
         <div id="commands">
-            <h2>Commandes du jeu</h2>
+            <h2>How to play</h2>
             <ul>
-                <li><strong>Flèche Haut / W :</strong> Monter</li>
-                <li><strong>Flèche Bas / S :</strong> Descendre</li>
-                <li><strong>Flèche Gauche / A :</strong> Aller à gauche</li>
-                <li><strong>Flèche Droite / D :</strong> Aller à droite</li>
-                <li><strong>Barre Espace :</strong> Courir</li>
-                <li><strong>Touche Escape :</strong> Mettre en pause</li>
-                <li><strong>Shift Gauche :</strong> Montrer les hitboxes</li>
+                <li><strong>Top arrow / W :</strong> Go up</li>
+                <li><strong>Bottom arrow / S :</strong> Go down</li>
+                <li><strong>Left arrow / A :</strong> Go left</li>
+                <li><strong>Right arrow / D :</strong> Go right</li>
+                <li><strong>Space bar :</strong> Run</li>
+                <li><strong>Escape :</strong> Pause menu</li>
+                <li><strong>Left shift :</strong> Show hitboxes</li>
             </ul>
             <div class="volume-control">
                 <label for="volume">Volume</label>
@@ -59,9 +59,9 @@
     
     
     <div id="gameSection" class="container">
-        <div class="score-container" id="score">Pièces collectées : 0</div>
-        <canvas id="gameCanvas" width="800" height="800"></canvas>
-        <button id="retryButton">Revenir au menu principal</button>
+        <div class="score-container" id="score">Collected coins : 0</div>
+        <canvas id="gameCanvas" width="700" height="700"></canvas>
+        <button id="retryButton">Back to Main menu</button>
         <button id="pauseButton">Pause</button>
         <audio id="gameMusic1" src="src/mp3/Pixel 4.mp3" loop></audio>
         <audio id="gameMusic2" src="src/mp3/Pixel 12.mp3" loop></audio>
@@ -79,25 +79,25 @@
     <div id="pauseMenu" class="container">
         <h2>Pause</h2>
         <div id="commands">
-            <h2>Commandes du jeu</h2>
+            <h2>How to play</h2>
             <ul>
-                <li><strong>Flèche Haut / W :</strong> Monter</li>
-                <li><strong>Flèche Bas / S :</strong> Descendre</li>
-                <li><strong>Flèche Gauche / A :</strong> Aller à gauche</li>
-                <li><strong>Flèche Droite / D :</strong> Aller à droite</li>
-                <li><strong>Barre Espace :</strong> Courir</li>
-                <li><strong>Touche Escape :</strong> Mettre en pause</li>
-                <li><strong>Shift Gauche :</strong> Montrer les hitboxes</li>
+                <li><strong>Top arrow / W :</strong> Go up</li>
+                <li><strong>Bottom arrow / S :</strong> Go down</li>
+                <li><strong>Left arrow / A :</strong> Go left</li>
+                <li><strong>Right arrow / D :</strong> Go right</li>
+                <li><strong>Space bar :</strong> Run</li>
+                <li><strong>Escape :</strong> Pause menu</li>
+                <li><strong>Left shift :</strong> Show hitboxes</li>
             </ul>
         </div>
         <div class="volume-control">
             <label for="volume">Volume</label>
             <input type="range" id="pauseVolume" name="volume" min="0" max="1" step="0.01" value="0.5">
         </div>
-        <button id="resumeButton">Reprendre</button>
+        <button id="resumeButton">Resume</button>
     </div>    
 
-    <div id="version">Version 1.1.0</div>
+    <div id="version">Version 1.1.1</div>
     <script type="module" src="script.js"></script>
 </body>
 </html>

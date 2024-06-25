@@ -691,7 +691,7 @@ function saveHighScore(score) {
 
 function updateScore() {
     const scoreElement = document.getElementById('score');
-    scoreElement.textContent = `Pièces collectées : ${score}`;
+    scoreElement.textContent = `Collected coins : ${score}`;
 }
 
 
