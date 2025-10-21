@@ -15,7 +15,7 @@ Your best runs are recorded and displayed in the main menu.
 | Action | Key |
 |:--|:--|
 | Move | **WASD** or **Arrow Keys** |
-| Run / Sprint | **Space** |
+| Sprint | **Space** |
 | Pause | **Escape** |
 | Toggle Hitboxes | **Left Shift** |
 
@@ -70,7 +70,6 @@ Massive thanks to all the talented creators whose work powers the experience:
 - Music by **Alkakrab** → https://alkakrab.itch.io  
 - Sound effects by **Kronbits** → https://kronbits.itch.io  
 - Firestorms by **BDragon1727** → https://bdragon1727.itch.io  
-- Wooden plank backgrounds hand-drawn by **Dani** ❤️
 
 > Third‑party assets remain the property of their respective authors.  
 > Always review individual license terms before reuse.
